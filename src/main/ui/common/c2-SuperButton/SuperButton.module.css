@@ -1,0 +1,49 @@
+.default {
+    padding: 10px 25px;
+    margin: 10px 0;
+    border-color: #3498db;
+    color: dimgrey;
+    box-shadow: 0 0 40px 40px #3498db inset, 0 0 0 0 #3498db;
+    -webkit-transition: all 150ms ease-in-out;
+    transition: all 150ms ease-in-out;
+    font-weight: bold;
+    border-radius: 8px;
+}
+
+.default:hover {
+    box-shadow: 0 0 10px 0 #3498db inset, 0 0 10px 4px #3498db;
+    background-color: steelblue;
+    color: navajowhite;
+}
+
+
+.red {
+    padding: 10px 25px;
+    border-radius: 8px;
+    border-color: #d9213b;
+    color: black;
+    background-image: -webkit-linear-gradient(45deg, #ff0000 50%, transparent 70%);
+    background-image: linear-gradient(85deg, #ff0000 50%, transparent 70%);
+    background-position: 100%;
+    background-size: 400%;
+    -webkit-transition: background 300ms ease-in-out;
+    transition: background 300ms ease-in-out;
+}
+
+.red:hover {
+    background-position: 0;
+}
+
+.disableClass{
+    padding: 25px;
+    background-image: url('https://feodal.by/upload/iblock/7db/7db6473d4bff97e4031132d19cf92f78.jpeg');
+    background-size: contain;
+    border-radius: 8px;
+    margin: 10px 0;
+    color:black;
+    font-weight: bold;
+    font-size: 15px;
+
+
+}
+
