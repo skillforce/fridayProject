@@ -12,6 +12,7 @@ const Test = () => {
     const [checked, setChecked] = useState<boolean>(false)//Делает чекбокс управляемым
     const [text, setText] = useState<string>('')//Делает input управляемым
     const error = text ? '' : 'Enter the text'//Для подсветки пустого инпута
+
     const showAlert = () => {
         if (error) {
             alert('Enter text in control input')
