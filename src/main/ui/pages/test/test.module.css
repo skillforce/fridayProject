@@ -1,7 +1,15 @@
 .test_component{
     display: flex;
-    flex-direction: column;
     justify-content: space-between;
+    margin: 20vh 250px;
+}
+
+.test_component div{
+    border: 2px solid black;
+    height: 350px;
+    width:300px;
+    display: flex;
     align-items: center;
-    margin: 150px 0;
+    justify-content: center;
+    flex-direction: column;
 }

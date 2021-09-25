@@ -18,6 +18,7 @@
 
 
 .red {
+    margin: 10px 0;
     padding: 10px 25px;
     border-radius: 8px;
     border-color: #d9213b;
@@ -34,13 +35,13 @@
     background-position: 0;
 }
 
-.disableClass{
+.disableClass {
     padding: 25px;
     background-image: url('https://feodal.by/upload/iblock/7db/7db6473d4bff97e4031132d19cf92f78.jpeg');
     background-size: contain;
     border-radius: 8px;
     margin: 10px 0;
-    color:black;
+    color: black;
     font-weight: bold;
     font-size: 15px;
 
