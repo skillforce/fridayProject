@@ -25,15 +25,14 @@ export const Routes = () => {
 
                 <Route path={'/'} exact render={() => <Redirect to={PATH.LOGIN}/>}/>
 
-
                 <Route path={PATH.ENTER_NEW_PASS} render={() => <EnterNewPass/>}/>
-                <Route path={PATH.ERROR_404} render={() => <Error404/>}/>
                 <Route path={PATH.LOGIN} render={() => <Login/>}/>
                 <Route path={PATH.PROFILE} render={() => <Profile/>}/>
                 <Route path={PATH.RECOVER_PASS} render={() => <RecoverPass/>}/>
                 <Route path={PATH.REGISTRATION} render={() => <Registration/>}/>
                 <Route path={PATH.TEST} render={() => <Test/>}/>
 
+                <Route render={() => <Error404/>}/>
 
             </Switch>
         </div>
