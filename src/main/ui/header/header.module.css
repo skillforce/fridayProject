@@ -1,34 +1,41 @@
-.header_tittle{
-    border: 2px solid black;
-    height: 60px;
-    display: flex;
-    justify-content: flex-end;
-    border-radius: 8px;
-    margin:0 2px;
-    background: -webkit-linear-gradient(90deg, rgb(91, 91, 91), rgb(0, 210, 216));
-    background: -moz-linear-gradient(90deg, rgb(91, 91, 91), rgb(0, 210, 216));
-    background: linear-gradient(90deg, rgb(91, 91, 91), rgb(0, 210, 216));
+.over {
+    background: #EBE0E9;
 }
-
+.logo {
+    font-size: 40px;
+    color: #21268F;
+}
+.header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding-left: 40px;
+    padding-right: 40px;
+}
+.header_tittle{
+    display: flex;
+    height: 60px;
+    align-items: center;
+}
+.menuIcon {
+    padding-right: 15px;
+}
 .header_nav{
-    width: 130px;
-    font-family: "Bodoni MT Poster Compressed";
-    margin: auto 15px auto 0;
     text-decoration: none;
-    color:white;
-    border:2px solid black;
-    padding: 4px 5px;
-    border-radius: 8px;
-    background: -webkit-linear-gradient(270deg, rgb(49, 49, 162), rgb(216, 111, 0));
-    background: -moz-linear-gradient(270deg, rgb(49, 49, 162), rgb(216, 111, 0));
-    background: linear-gradient(270deg, rgb(49, 49, 162), rgb(216, 111, 0));
+    color: #9f99a8;
+    padding-left: 35px;
+    height: 100%;
+    padding-right: 35px;
+    display: flex;
+    align-items: center;
+    border-bottom: 5px solid transparent;
 }
 
 .header_nav_active{
-    background: -webkit-linear-gradient(135deg, rgb(41, 79, 213), rgb(89, 218, 45));
-    background: -moz-linear-gradient(135deg, rgb(41, 79, 213), rgb(89, 218, 45));
-    background: linear-gradient(135deg, rgb(41, 79, 213), rgb(89, 218, 45));
-    color: black;
-    font-weight: 600;
-    font-size: 18px;
+    color: #2D2E46;
+    border-bottom: 5px solid #21268F;
+    background: #DCCCDB;
 }

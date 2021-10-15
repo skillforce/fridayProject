@@ -1,5 +1,6 @@
 import React, {ChangeEvent, DetailedHTMLProps, InputHTMLAttributes, KeyboardEvent} from 'react'
 import s from './SuperInputText.module.css'
+import cn from './SuperInputText.module.css'
 
 // тип пропсов обычного инпута
 type DefaultInputPropsType = DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>
@@ -11,6 +12,7 @@ type SuperInputTextPropsType = DefaultInputPropsType & { // и + ещё проп
     onEnter?: (e: React.KeyboardEvent<HTMLInputElement>) => void
     error?: string
     spanClassName?: string
+    label: string
 }
 
 const {superInput, errorInput} = s;
@@ -21,6 +23,7 @@ const SuperInputText: React.FC<SuperInputTextPropsType> = (
         onChange, onChangeText,
         onKeyPress, onEnter,
         error,
+        label,
         className, spanClassName,
         ...restProps// все остальные пропсы попадут в объект restProps
     }
@@ -44,14 +47,28 @@ const SuperInputText: React.FC<SuperInputTextPropsType> = (
 
 
     return (
+        // <input
+        //     type={'text'}
+        //     onChange={onChangeCallback}
+        //     onKeyPress={onKeyPressCallback}
+        //     className={finalInputClassName}
+        //     placeholder={error}
+        //     {...restProps} // отдаём инпуту остальные пропсы если они есть (value например там внутри)
+        // />
+
+    <div className={cn.group}>
         <input
-            type={'text'}
-            onChange={onChangeCallback}
-            onKeyPress={onKeyPressCallback}
-            className={finalInputClassName}
-            placeholder={error}
-            {...restProps} // отдаём инпуту остальные пропсы если они есть (value например там внутри)
+               required
+               onChange={onChangeCallback}
+               onKeyPress={onKeyPressCallback}
+               className={finalInputClassName}
+               placeholder={error}
+               {...restProps}
         />
+            <span className={cn.highlight}></span>
+            <span className={cn.bar}></span>
+            <label>{label}</label>
+    </div>
 
     )
 }
