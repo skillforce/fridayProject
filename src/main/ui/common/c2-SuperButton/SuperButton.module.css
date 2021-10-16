@@ -1,20 +1,26 @@
 .default {
-    padding: 10px 25px;
-    margin: 10px 0;
-    border-color: #3498db;
-    color: dimgrey;
-    box-shadow: 0 0 40px 40px #3498db inset, 0 0 0 0 #3498db;
-    -webkit-transition: all 150ms ease-in-out;
-    transition: all 150ms ease-in-out;
+    border-radius: 50px;
+    outline: none;
+    border: none;
+    background: #21268F;
+    color: white;
+    font-size: 16px;
     font-weight: bold;
-    border-radius: 8px;
+    padding: 9px 40px;
+    cursor: pointer;box-shadow: 0px 4px 18px rgba(33, 38, 143, 0.35), inset 0px 1px 0px rgba(255, 255, 255, 0.3);
+}
+.default:hover {
+background: #1a1f7c;
+}
+.default:active {
+    background: #080932;
 }
 
-.default:hover {
-    box-shadow: 0 0 10px 0 #3498db inset, 0 0 10px 4px #3498db;
-    background-color: steelblue;
-    color: navajowhite;
-}
+/*.default:hover {*/
+/*    box-shadow: 0 0 10px 0 #3498db inset, 0 0 10px 4px #3498db;*/
+/*    background-color: steelblue;*/
+/*    color: navajowhite;*/
+/*}*/
 
 
 .red {
@@ -22,7 +28,7 @@
     padding: 10px 25px;
     border-radius: 8px;
     border-color: #d9213b;
-    color: black;
+    color: #000000;
     background-image: -webkit-linear-gradient(45deg, #ff0000 50%, transparent 70%);
     background-image: linear-gradient(85deg, #ff0000 50%, transparent 70%);
     background-position: 100%;

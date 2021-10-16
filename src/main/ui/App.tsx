@@ -3,8 +3,7 @@ import './App.css';
 import Header from './header/header';
 import {Routes} from './routes/Routes';
 
-//Registration branch
-
+// +_+
 const App = () => {
     return (
         <div className="App">
