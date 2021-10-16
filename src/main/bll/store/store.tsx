@@ -9,25 +9,22 @@ import thunkMiddleware from 'redux-thunk'
 
 
 const reducers = combineReducers({
-   enterNewPass:EnterNewPassReducer,
-   login: LoginReducer,
-   test: TestReducer,
-   recoverPass: RecoverPassReducer,
-   registration:RegistrationReducer,
-   error404:Error404Reducer
+    enterNewPass: EnterNewPassReducer,
+    login: LoginReducer,
+    test: TestReducer,
+    recoverPass: RecoverPassReducer,
+    registration: RegistrationReducer,
+    error404: Error404Reducer
 })
 
 
-const store = createStore(reducers,applyMiddleware(thunkMiddleware))
+const store = createStore(reducers, applyMiddleware(thunkMiddleware))
 
 
 export type AppStoreType = ReturnType<typeof reducers>
 
 
-
-
 export default store
-
 
 
 // @ts-ignore
