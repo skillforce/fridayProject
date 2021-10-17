@@ -4,9 +4,10 @@ import SuperInputText from '../../common/c1-SuperInputText/SuperInputText';
 import {NavLink, Redirect} from 'react-router-dom';
 import SuperButton from '../../common/c2-SuperButton/SuperButton';
 import {useDispatch, useSelector} from 'react-redux';
-import {logInTC} from '../../../bll/redusers/login-reducer';
+import {logInTC, setLoginError} from '../../../bll/redusers/login-reducer';
 import {AppStoreType} from '../../../bll/store/store';
 import {PATH} from '../../routes/Routes';
+import {setIsValidReg} from '../../../bll/redusers/registration-reducer';
 
 
 type ValidatorType = {
@@ -43,7 +44,6 @@ const useValidator = (value: any, validator: ValidatorType) => {
                     break;
             }
         }
-
     }, [value])
 
 
@@ -71,7 +71,9 @@ const useValidator = (value: any, validator: ValidatorType) => {
 const useInput = (initialValue: any, validator: ValidatorType) => {
     const [value, setValue] = useState(initialValue);
     const [touched, setTouched] = useState(false);
+
     const valid = useValidator(value, validator)
+
     const onChange = (e: ChangeEvent<HTMLInputElement> | any) => {
         if (e.hasOwnProperty('target')) {
             setValue(e.target.value)
@@ -98,8 +100,8 @@ const useInput = (initialValue: any, validator: ValidatorType) => {
 const Login = () => {
 
     const email = useInput('', {isEmpty: true, minLength: 3, maxLength: 50, isValidEmail: false});
-    const password = useInput('', {isEmpty: true, minLength: 5, maxLength: 20});
-    const rememberMe = useInput(false, {isEmpty: true, minLength: 5, maxLength: 20});
+    const password = useInput('', {isEmpty: true, minLength: 7, maxLength: 20});
+    const rememberMe = useInput(false, {isEmpty: true, minLength: 7, maxLength: 20});
 
     const isEmptyEmailMsg = email.touched && email.isEmpty ?
         <div style={{color: 'red'}}>Input should be stuffed</div> : '';
@@ -143,6 +145,15 @@ const Login = () => {
         password.onBlur(false)
         rememberMe.onChange(false)
 
+    }
+
+    const signUpClickHandler = () => {
+        dispatch(setIsValidReg(false))
+    }
+
+
+    if (email.touched || email.value || password.touched || password.value) {
+        dispatch(setLoginError(''))
     }
 
 
@@ -191,7 +202,14 @@ const Login = () => {
                     <input value={rememberMe.value} onChange={rememberMe.onChange} type={'checkbox'}/> remember me
 
 
-                    <NavLink className={cn.linkforgot} to={'./#/recPassword'}>Forgot password</NavLink>
+                    <NavLink className={cn.linkforgot} to={PATH.RECOVER_PASS}>Forgot password</NavLink>
+
+
+                    <div><NavLink onClick={signUpClickHandler} className={cn.linkforgot} to={PATH.REGISTRATION}>Sign
+                        up</NavLink></div>
+                    {/*Если пользователь который только что зарегался решит еще раз зарегаться нам нужно откатить IsValidRec в registration reducer*/}
+
+
                     <SuperButton onClick={onClickHandler} disabled={isLoginDisabled}
                                  style={{width: 280, marginTop: 80, marginBottom: 40}}>Login</SuperButton>
 
