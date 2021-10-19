@@ -1,4 +1,4 @@
-import React, {ChangeEvent, useEffect, useState} from 'react';
+import React from 'react';
 import cn from './registation.module.css';
 import SuperInputText from '../../common/c1-SuperInputText/SuperInputText';
 import {NavLink, Redirect} from 'react-router-dom';
@@ -7,93 +7,8 @@ import {useDispatch, useSelector} from 'react-redux';
 import {AppStoreType} from '../../../bll/store/store';
 import {PATH} from '../../routes/Routes';
 import {setSignUpError, SignUpTC} from '../../../bll/redusers/registration-reducer';
-
-
-type ValidatorType = {
-    isEmpty: boolean
-    minLength: number
-    maxLength: number,
-    isValidEmail?: boolean
-}
-
-const useValidator = (value: any, validator: ValidatorType) => {
-
-    const [isEmpty, setIsEmpty] = useState(true);
-    const [minLengthError, setMinLengthError] = useState(false);
-    const [maxLengthError, setMaxLengthError] = useState(false);
-    const [isValidEmailError, setIsValidEmailError] = useState(false);
-    const [inputValid, setInputValid] = useState(false);
-
-
-    useEffect(() => {
-        for (const valid in validator) {
-            switch (valid) {
-                case 'minLength':
-                    value.length < validator[valid] ? setMinLengthError(true) : setMinLengthError(false)
-                    break;
-                case 'isEmpty':
-                    value ? setIsEmpty(false) : setIsEmpty(true)
-                    break;
-                case 'maxLength':
-                    value.length > validator[valid] ? setMaxLengthError(true) : setMaxLengthError(false)
-                    break;
-                case 'isValidEmail':
-                    const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-                    re.test(String(value).toLowerCase()) ? setIsValidEmailError(false) : setIsValidEmailError(true)
-                    break;
-            }
-        }
-    }, [value])
-
-
-    useEffect(() => {
-        if (isEmpty || minLengthError || maxLengthError || isValidEmailError) {
-            setInputValid(false)
-        } else {
-            setInputValid(true)
-        }
-    }, [isEmpty, minLengthError, maxLengthError, isValidEmailError])
-
-
-    return {
-        isEmpty,
-        minLengthError,
-        maxLengthError,
-        isValidEmailError,
-        inputValid
-    }
-
-
-}
-
-
-const useInput = (initialValue: any, validator: ValidatorType) => {
-    const [value, setValue] = useState(initialValue);
-    const [touched, setTouched] = useState(false);
-
-    const valid = useValidator(value, validator)
-
-    const onChange = (e: ChangeEvent<HTMLInputElement> | any) => {
-        if (e.hasOwnProperty('target')) {
-            setValue(e.target.value)
-        } else {
-            setValue(e)
-        }
-    }
-
-    const onBlur = (t: boolean) => {
-        setTouched(t)
-    }
-
-    return {
-        value,
-        touched,
-        onChange,
-        onBlur,
-        ...valid
-    }
-
-}
+import {useInput} from '../login/login';
+import {ErrorWindow} from '../../common/ErrorWindow/ErrorWindow';
 
 
 const Registration = () => {
@@ -103,36 +18,23 @@ const Registration = () => {
     const password1 = useInput('', {isEmpty: true, minLength: 7, maxLength: 20});
 
 
-    const isEmptyEmailMsg = email.touched && email.isEmpty ?
-        <div style={{color: 'red'}}>Input should be stuffed</div> : '';
-    const isEmptyPassMsg = password.touched && password.isEmpty ?
-        <div style={{color: 'red'}}>Input should be stuffed</div> : '';
-    const isEmptyPass1Msg = password1.touched && password1.isEmpty ?
-        <div style={{color: 'red'}}>Input should be stuffed</div> : '';
+    const isEmptyEmailMsg = email.touched && email.isEmpty;
+    const isEmptyPassMsg = password.touched && password.isEmpty;
     //проверка на пустоту
 
-    const minLengthEmailMsg = email.touched && email.minLengthError ?
-        <div style={{color: 'red'}}>Minimal length of email should be more than 3 symbols</div> : '';
-    const minLengthPassMsg = password.touched && password.minLengthError ?
-        <div style={{color: 'red'}}>Minimal length of password should be more than 8 symbols</div> : '';
-    const minLengthPass1Msg = password1.touched && password1.minLengthError ?
-        <div style={{color: 'red'}}>Minimal length of password should be more than 8 symbols</div> : '';
+    const minLengthEmailMsg = email.touched && email.minLengthError;
+    const minLengthPassMsg = password.touched && password.minLengthError;
     // проверка на минимальную длинну
 
-    const isValidEmailMsg = email.touched && email.isValidEmailError ?
-        <div style={{color: 'red'}}>Invalid email</div> : '';
-    const maxLengthPassMsg = password.touched && password.maxLengthError ?
-        <div style={{color: 'red'}}>Maximal length of password should be low than 20 symbols</div> : '';
-    const maxLengthPass1Msg = password1.touched && password1.maxLengthError ?
-        <div style={{color: 'red'}}>Maximal length of password should be low than 20 symbols</div> : '';
+    const isValidEmailMsg = email.touched && email.isValidEmailError;
+    const maxLengthPassMsg = password.touched && password.maxLengthError;
     // проверка на валидность имейла и максимальную длинну пароля
 
-
     const isLoginDisabled = !email.inputValid || !password.inputValid;
-//отключаем кнопку если хоть одна ошибка есть
+    //отключаем кнопку если хоть одна ошибка есть
 
-    const isPasswordCorrectReEnter = password.value !== password1.value && password.touched ?
-        <div style={{color: 'red'}}>Entered passwords doesn't match</div> : '';
+
+    const isPasswordCorrectReEnter = password.value !== password1.value && password.touched;
 
 
     const dispatch = useDispatch();
@@ -199,29 +101,24 @@ const Registration = () => {
                 <form>
                     {SignUpErrorMsg && <div style={{color: 'red'}}>{SignUpErrorMsg}</div>}
 
-                    {isEmptyEmailMsg}
-                    {minLengthEmailMsg}
-                    {isValidEmailMsg}
+                    <ErrorWindow isEmptyEmailMsg={isEmptyEmailMsg} minLengthEmailMsg={minLengthEmailMsg}
+                                 isValidEmailMsg={isValidEmailMsg}/>
 
                     <SuperInputText onChange={email.onChange} onBlur={() => {
                         email.onBlur(true)
                     }} value={email.value}
                                     label={'Enter your email'}/>
 
+                    <ErrorWindow isEmptyPassMsg={isEmptyPassMsg} minLengthPassMsg={minLengthPassMsg}
+                                 maxLengthPassMsg={maxLengthPassMsg}/>
 
-                    {isEmptyPassMsg}
-                    {minLengthPassMsg}
-                    {maxLengthPassMsg}
 
                     <SuperInputText onChange={password.onChange} onBlur={() => {
                         password.onBlur(true)
                     }} value={password.value}
                                     label={'Enter your unique password'} type={'password'}/>
 
-                    {isPasswordCorrectReEnter}
-                    {isEmptyPass1Msg}
-                    {minLengthPass1Msg}
-                    {maxLengthPass1Msg}
+                    <ErrorWindow isPasswordCorrectReEnter={isPasswordCorrectReEnter}/>
 
                     <SuperInputText onChange={password1.onChange} onBlur={() => {
                         password1.onBlur(true)
@@ -229,8 +126,8 @@ const Registration = () => {
                                     label={'Repeat your password'} type={'password'}/>
 
 
-                    <NavLink className={cn.linkforgot} to={'./#/recPassword'}>Sign in</NavLink>
-                    <SuperButton onClick={onClickHandler} disabled={isLoginDisabled || !!isPasswordCorrectReEnter}
+                    <NavLink className={cn.linkforgot} to={PATH.LOGIN}>Sign in</NavLink>
+                    <SuperButton onClick={onClickHandler} disabled={isLoginDisabled || isPasswordCorrectReEnter}
                                  style={{width: 280, marginTop: 80, marginBottom: 40}}>Sign up</SuperButton>
 
 

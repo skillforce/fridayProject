@@ -8,6 +8,7 @@ import {Error404Reducer} from '../redusers/error404-reducer';
 import thunkMiddleware from 'redux-thunk'
 import {composeWithDevTools} from 'redux-devtools-extension';
 import ProfileReducer from '../redusers/profile-reducer';
+import {AppReducer} from '../redusers/app-reducer';
 
 
 const reducers = combineReducers({
@@ -17,7 +18,8 @@ const reducers = combineReducers({
     recoverPass: RecoverPassReducer,
     registration: RegistrationReducer,
     error404: Error404Reducer,
-    profile: ProfileReducer
+    profile: ProfileReducer,
+    app:AppReducer
 })
 
 

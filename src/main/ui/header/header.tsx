@@ -14,23 +14,21 @@ const {header_tittle, header_nav, header_nav_active} = s;
 
 const Header = () => {
 
-    const dispatch=useDispatch();
+    const dispatch = useDispatch();
 
     const isLogin = useSelector<AppStoreType, boolean>(state => state.login.logIn);
 
 
-
-
-     const logOutClickHandler=()=>{
-         dispatch(logOutTC())
-     }
+    const logOutClickHandler = () => {
+        dispatch(logOutTC())
+    }
 
     return (
         <div className={cn.over}>
             <div className={cn.header}>
                 <div><FaReact className={cn.logo}/></div>
                 <div className={header_tittle}>
-                    <NavLink to={PATH.ENTER_NEW_PASS} className={header_nav} activeClassName={header_nav_active}>enter
+                    <NavLink to={PATH.CREATE_NEW_PASS} className={header_nav} activeClassName={header_nav_active}>Create
                         new pass</NavLink>
                     <NavLink to={PATH.ERROR_404} className={header_nav}
                              activeClassName={header_nav_active}>error404</NavLink>
@@ -42,6 +40,7 @@ const Header = () => {
                     <NavLink to={PATH.REGISTRATION} className={header_nav}
                              activeClassName={header_nav_active}>registration</NavLink>
                     <NavLink to={PATH.TEST} className={header_nav} activeClassName={header_nav_active}>test</NavLink>
+
                 </div>
                 {isLogin && <div><SuperButton onClick={logOutClickHandler}>Logout</SuperButton></div>}
             </div>

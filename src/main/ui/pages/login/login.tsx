@@ -8,6 +8,7 @@ import {logInTC, setLoginError} from '../../../bll/redusers/login-reducer';
 import {AppStoreType} from '../../../bll/store/store';
 import {PATH} from '../../routes/Routes';
 import {setIsValidReg} from '../../../bll/redusers/registration-reducer';
+import {ErrorWindow} from '../../common/ErrorWindow/ErrorWindow';
 
 
 type ValidatorType = {
@@ -68,7 +69,7 @@ const useValidator = (value: any, validator: ValidatorType) => {
 }
 
 
-const useInput = (initialValue: any, validator: ValidatorType) => {
+export const useInput = (initialValue: any, validator: ValidatorType) => {
     const [value, setValue] = useState(initialValue);
     const [touched, setTouched] = useState(false);
 
@@ -103,26 +104,21 @@ const Login = () => {
     const password = useInput('', {isEmpty: true, minLength: 7, maxLength: 20});
     const rememberMe = useInput(false, {isEmpty: true, minLength: 7, maxLength: 20});
 
-    const isEmptyEmailMsg = email.touched && email.isEmpty ?
-        <div style={{color: 'red'}}>Input should be stuffed</div> : '';
-    const isEmptyPassMsg = password.touched && password.isEmpty ?
-        <div style={{color: 'red'}}>Input should be stuffed</div> : ''; //проверка на пустоту
+    const isEmptyEmailMsg = email.touched && email.isEmpty;
+    const isEmptyPassMsg = password.touched && password.isEmpty
+    //проверка на пустоту
 
-    const minLengthEmailMsg = email.touched && email.minLengthError ?
-        <div style={{color: 'red'}}>Minimal length of email should be more than 3 symbols</div> : '';
-    const minLengthPassMsg = password.touched && password.minLengthError ?
-        <div style={{color: 'red'}}>Minimal length of password should be more than 8 symbols</div> : '';
+    const minLengthEmailMsg = email.touched && email.minLengthError;
+    const minLengthPassMsg = password.touched && password.minLengthError;
     // проверка на минимальную длинну
 
-    const isValidEmailMsg = email.touched && email.isValidEmailError ?
-        <div style={{color: 'red'}}>Invalid email</div> : '';
-    const maxLengthPassMsg = password.touched && password.maxLengthError ?
-        <div style={{color: 'red'}}>Maximal length of password should be low than 20 symbols</div> : '';
+    const isValidEmailMsg = email.touched && email.isValidEmailError;
+    const maxLengthPassMsg = password.touched && password.maxLengthError;
     // проверка на валидность имейла и максимальную длинну пароля
 
 
     const isLoginDisabled = !email.inputValid || !password.inputValid;
-//отключаем кнопку если хоть одна ошибка есть
+    //отключаем кнопку если хоть одна ошибка есть
 
     const dispatch = useDispatch();
 
@@ -179,19 +175,19 @@ const Login = () => {
                 <form action="">
                     {ErrorRequestMsg && <div>{ErrorRequestMsg}</div>}
 
-                    {isEmptyEmailMsg}
-                    {minLengthEmailMsg}
-                    {isValidEmailMsg}
+
+                    <ErrorWindow isEmptyEmailMsg={isEmptyEmailMsg} minLengthEmailMsg={minLengthEmailMsg}
+                                 isValidEmailMsg={isValidEmailMsg}/>
+
 
                     <SuperInputText onChange={email.onChange} onBlur={() => {
                         email.onBlur(true)
                     }} value={email.value}
                                     label={'Email'}/>
 
+                    <ErrorWindow isEmptyPassMsg={isEmptyPassMsg} minLengthPassMsg={minLengthPassMsg}
+                                 maxLengthPassMsg={maxLengthPassMsg}/>
 
-                    {isEmptyPassMsg}
-                    {minLengthPassMsg}
-                    {maxLengthPassMsg}
 
                     <SuperInputText onChange={password.onChange} onBlur={() => {
                         password.onBlur(true)

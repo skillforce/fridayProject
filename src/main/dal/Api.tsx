@@ -9,6 +9,11 @@ const instance = axios.create({
     ...settings
 })
 
+const instanceHeroky = axios.create({
+    baseURL: "https://neko-back.herokuapp.com/2.0",
+    ...settings
+})
+
 // api
 
 export type RequestDataType = {
@@ -20,6 +25,18 @@ export type SignUpDataRequestType = {
     email: string
     password: string
 }
+export type forgotPassDataType = {
+    email: string
+    from: string
+    message:string
+}
+export type newPassDataType = {
+    password: string
+    resetPasswordToken: string
+}
+
+
+
 
 
 export const authAPI = {
@@ -31,7 +48,16 @@ export const authAPI = {
     },
     signUp(data: SignUpDataRequestType) {
         return instance.post('auth/register', data);
-    }
+    },
+    authMe() {
+        return instance.post('auth/me');
+    },
+    forgotPass(data:forgotPassDataType) {
+        return instanceHeroky.post('auth/forgot',data);
+    },
+    setNewPass(data:newPassDataType) {
+        return instanceHeroky.post('/auth/set-new-password',data);
+    },
 }
 
 
