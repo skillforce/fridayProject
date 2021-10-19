@@ -5,6 +5,7 @@ import {Routes} from './routes/Routes';
 import {AppStoreType} from '../bll/store/store';
 import {useDispatch, useSelector} from 'react-redux';
 import {AuthMe, IsInitializedStatusType} from '../bll/redusers/app-reducer';
+import {Preloader} from './common/Preloader/Preloader';
 
 // +_+
 
@@ -20,7 +21,7 @@ const App = () => {
 
 
     if (isInitialized === 'loading') {
-        return <div>loading...</div>
+        return <Preloader/>
     }
 
     return (

@@ -9,6 +9,7 @@ import {AppStoreType} from '../../../bll/store/store';
 import {PATH} from '../../routes/Routes';
 import {setIsValidReg} from '../../../bll/redusers/registration-reducer';
 import {ErrorWindow} from '../../common/ErrorWindow/ErrorWindow';
+import {Preloader} from '../../common/Preloader/Preloader';
 
 
 type ValidatorType = {
@@ -154,7 +155,7 @@ const Login = () => {
 
 
     if (isLoading) {
-        return <h1>...loading</h1>
+        return <Preloader/>
     }
 
 
@@ -173,7 +174,7 @@ const Login = () => {
                     Login
                 </div>
                 <form action="">
-                    {ErrorRequestMsg && <div>{ErrorRequestMsg}</div>}
+                    {ErrorRequestMsg && <div style={{color:'red'}}>{ErrorRequestMsg}</div>}
 
 
                     <ErrorWindow isEmptyEmailMsg={isEmptyEmailMsg} minLengthEmailMsg={minLengthEmailMsg}

@@ -1,5 +1,7 @@
 import {Dispatch} from 'redux';
 import {authAPI, forgotPassDataType, newPassDataType} from '../../dal/Api';
+import {setIsLoading} from './login-reducer';
+import {setSignUpProgress} from './registration-reducer';
 
 
 const SET_IS_MESSAGE_SEND = 'AppReducer/SET_IS_MESSAGE_SEND';
@@ -48,6 +50,12 @@ export const SendMessage = (data: forgotPassDataType) => {
                 dispatch(SetErrorRecoveryPassMessage(errMsg))
                 dispatch(SetIsMessageSend('error'))
             })
+            .finally(() => {
+                    setTimeout(() => {
+                        dispatch(SetIsMessageSend('error'))
+                    }, 2000)
+                }
+            )
     }
 }
 export const CreateNewPassword = (data: newPassDataType) => {

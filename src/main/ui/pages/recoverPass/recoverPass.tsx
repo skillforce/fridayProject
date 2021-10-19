@@ -10,6 +10,8 @@ import {useInput} from '../login/login';
 import {isMessageSentStatusType, SendMessage} from '../../../bll/redusers/recoverPass-reducer';
 import {setLoginError} from '../../../bll/redusers/login-reducer';
 import {ErrorWindow} from '../../common/ErrorWindow/ErrorWindow';
+import {Preloader} from '../../common/Preloader/Preloader';
+import {ResponsePage} from '../../common/ResponsePage/ResponsePage';
 
 
 const RecoverPass = () => {
@@ -47,12 +49,12 @@ const RecoverPass = () => {
     }
 
     if (isMessageSentStatus === 'loading') {
-        return <div>loading...</div>
+        return <Preloader/>
     }
 
 
     if (isMessageSentStatus === 'sent') {
-        return <div>SUCCESS...</div>
+        return <ResponsePage typeOfPage={'sent'} email={email.value}/>
     }
 
 

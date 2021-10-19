@@ -10,6 +10,8 @@ import {useInput} from '../login/login';
 import {CreateNewPassword, isMessageSentStatusType} from '../../../bll/redusers/recoverPass-reducer';
 import {setLoginError} from '../../../bll/redusers/login-reducer';
 import {ErrorWindow} from '../../common/ErrorWindow/ErrorWindow';
+import {Preloader} from '../../common/Preloader/Preloader';
+import {ResponsePage} from '../../common/ResponsePage/ResponsePage';
 
 
 export const SetNewPassword = () => {
@@ -51,15 +53,14 @@ export const SetNewPassword = () => {
     }
 
     if (isMessageSentStatus === 'loading') {
-        return <div>loading...</div>
+        return <Preloader/>
     }
 
 
     if (isMessageSentStatus === 'sent') {
         return (<div>
-                <div>Succes!</div>
-                <NavLink className={cn.linkforgot} to={PATH.LOGIN}>Sign in</NavLink>
-            </div>
+                <ResponsePage typeOfPage={'success'}/>
+                </div>
         )
     }
 

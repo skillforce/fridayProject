@@ -9,6 +9,8 @@ import {PATH} from '../../routes/Routes';
 import {setSignUpError, SignUpTC} from '../../../bll/redusers/registration-reducer';
 import {useInput} from '../login/login';
 import {ErrorWindow} from '../../common/ErrorWindow/ErrorWindow';
+import {Preloader} from '../../common/Preloader/Preloader';
+import {ResponsePage} from '../../common/ResponsePage/ResponsePage';
 
 
 const Registration = () => {
@@ -30,7 +32,7 @@ const Registration = () => {
     const maxLengthPassMsg = password.touched && password.maxLengthError;
     // проверка на валидность имейла и максимальную длинну пароля
 
-    const isLoginDisabled = !email.inputValid || !password.inputValid;
+    const isLoginDisabled = email.inputValid || password.inputValid;
     //отключаем кнопку если хоть одна ошибка есть
 
 
@@ -71,13 +73,13 @@ const Registration = () => {
 
 
     if (isLoading && signUpProgress === 'loading') {
-        return <h1>...loading</h1>
+        return <Preloader/>
     }
     if (isLoading && signUpProgress === 'success') {
-        return <h1>OK</h1>
+        return  <ResponsePage typeOfPage={'success'}/>
     }
     if (isLoading && signUpProgress === 'error') {
-        return <h1>ERROR</h1>
+        return <ResponsePage typeOfPage={'error'}/>
     }
 
     if (isCorrectReg) {
@@ -127,12 +129,13 @@ const Registration = () => {
 
 
                     <NavLink className={cn.linkforgot} to={PATH.LOGIN}>Sign in</NavLink>
-                    <SuperButton onClick={onClickHandler} disabled={isLoginDisabled || isPasswordCorrectReEnter}
+                    <SuperButton onClick={onClickHandler} disabled={!isLoginDisabled || isPasswordCorrectReEnter}
                                  style={{width: 280, marginTop: 80, marginBottom: 40}}>Sign up</SuperButton>
 
 
                 </form>
             </div>
+
         </div>
     );
 }
