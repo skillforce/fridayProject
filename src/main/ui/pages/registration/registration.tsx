@@ -32,11 +32,12 @@ const Registration = () => {
     const maxLengthPassMsg = password.touched && password.maxLengthError;
     // проверка на валидность имейла и максимальную длинну пароля
 
-    const isLoginDisabled = email.inputValid || password.inputValid;
+    const isLoginDisabled = email.inputValid && password.inputValid;
     //отключаем кнопку если хоть одна ошибка есть
 
 
     const isPasswordCorrectReEnter = password.value !== password1.value && password.touched;
+    const isPasswordDublicate = password.value === password1.value;
 
 
     const dispatch = useDispatch();
@@ -76,7 +77,7 @@ const Registration = () => {
         return <Preloader/>
     }
     if (isLoading && signUpProgress === 'success') {
-        return  <ResponsePage typeOfPage={'success'}/>
+        return <ResponsePage typeOfPage={'success'}/>
     }
     if (isLoading && signUpProgress === 'error') {
         return <ResponsePage typeOfPage={'error'}/>
@@ -129,7 +130,7 @@ const Registration = () => {
 
 
                     <NavLink className={cn.linkforgot} to={PATH.LOGIN}>Sign in</NavLink>
-                    <SuperButton onClick={onClickHandler} disabled={!isLoginDisabled || isPasswordCorrectReEnter}
+                    <SuperButton onClick={onClickHandler} disabled={!isPasswordDublicate || !isLoginDisabled}
                                  style={{width: 280, marginTop: 80, marginBottom: 40}}>Sign up</SuperButton>
 
 
