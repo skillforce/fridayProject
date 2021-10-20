@@ -7,6 +7,7 @@ import RecoverPass from '../pages/recoverPass/recoverPass';
 import Registration from '../pages/registration/registration';
 import Test from '../pages/test/test';
 import SetNewPassword from '../pages/setNewPassword/setNewPassword';
+import React from 'react';
 
 export const PATH = {
     ERROR_404: '/err404',
