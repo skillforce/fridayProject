@@ -64,7 +64,7 @@ export const logOutTC = () => {
         dispatch(setIsLoading(true))
         authAPI.logOut()
             .then(res => {
-                    dispatch(logInTrue(false))
+
                     dispatch(setProfile({
                         _id: null,
                         email: null,
@@ -78,6 +78,7 @@ export const logOutTC = () => {
                         rememberMe: null,
                         error: null
                     }))
+                dispatch(logInTrue(false))
                 }
             )
             .catch(error => {

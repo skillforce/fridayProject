@@ -1,9 +1,13 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {useSelector} from 'react-redux';
 import {AppStoreType} from '../../../bll/store/store';
 import {Redirect} from 'react-router-dom';
 import {PATH} from '../../routes/Routes';
 import {InitialStateLoginType} from '../../../bll/redusers/profile-reducer';
+import {Preloader} from '../../common/Preloader/Preloader';
+import cn from './profile.module.css';
+import EmptyAva from './EmptyAva.png'
+import EditProfile from './EditProfile/EditProfile';
 
 
 const Profile = () => {
@@ -12,6 +16,13 @@ const Profile = () => {
     const ErrorRequestMsg = useSelector<AppStoreType, string>(state => state.login.logInError);
     const isLoading = useSelector<AppStoreType, boolean>(state => state.login.isLoading);
     const profile = useSelector<AppStoreType, InitialStateLoginType>(state => state.profile)
+
+
+    const[isEditMode, setIsEditMode]=useState(false)
+
+    const onClickHandler=(newStatus:boolean)=>{
+        setIsEditMode(newStatus)
+    }
 
     const {
         _id,
@@ -29,7 +40,7 @@ const Profile = () => {
 
 
     if (isLoading) {
-        return (<div>...loading</div>)
+        return <Preloader/>
     }
 
 
@@ -39,13 +50,21 @@ const Profile = () => {
 
 
     return (
-        <div>
-            {ErrorRequestMsg && <div>{ErrorRequestMsg}</div>}
-            <div>Name:{name}</div>
-            {avatar && <img src={avatar} alt="ava"/>}
-            <div>id:{_id}</div>
-            <div>Email:{email}</div>
-            <div>avatarURL:{avatar}</div>
+         <div className={cn.autorization}>
+             {!isEditMode &&<div className={cn.form}>
+                <div className={cn.hTit}>
+                    It-incubator
+                </div>
+                 <div className={cn.nameProfile}>{name}</div>
+                <div className={cn.ava_img}><img src={avatar? avatar : EmptyAva} alt="avator"/></div>
+                <div className={cn.tit}>
+                    <div >Email:{email}</div>
+                    <div>ID:{_id}</div>
+                </div>
+                <button onClick={()=>{onClickHandler(true)}}>Edit profile</button>
+            </div>}
+             {isEditMode && <EditProfile onClickHandler={onClickHandler} isEditMode={isEditMode} />}
+
         </div>
     );
 }

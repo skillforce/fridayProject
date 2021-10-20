@@ -34,6 +34,10 @@ export type newPassDataType = {
     password: string
     resetPasswordToken: string
 }
+export type SetProfileType = {
+    name: string
+    avatar: string
+}
 
 
 
@@ -41,23 +45,27 @@ export type newPassDataType = {
 
 export const authAPI = {
     login(data: RequestDataType) {
-        return instance.post('auth/login', data);
+        return instance.post('/auth/login', data);
     },
     logOut() {
-        return instance.delete('auth/me');
+        return instance.delete('/auth/me');
     },
     signUp(data: SignUpDataRequestType) {
-        return instance.post('auth/register', data);
+        return instance.post('/auth/register', data);
     },
     authMe() {
-        return instance.post('auth/me');
+        return instance.post('/auth/me');
     },
     forgotPass(data:forgotPassDataType) {
-        return instanceHeroky.post('auth/forgot',data);
+        return instanceHeroky.post('/auth/forgot',data);
     },
     setNewPass(data:newPassDataType) {
         return instanceHeroky.post('/auth/set-new-password',data);
     },
 }
 
-
+export const profileAPI ={
+    setProfile(data:SetProfileType){
+        return instanceHeroky.put('/auth/me',data);
+    }
+}
