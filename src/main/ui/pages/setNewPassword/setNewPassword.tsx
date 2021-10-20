@@ -44,9 +44,9 @@ export const SetNewPassword = () => {
     const maxLengthPassMsg = password.touched && password.maxLengthError;
 
 
-    const isPasswordCorrectReEnter = password.value !== password1.value && password.touched;
+    const isPasswordCorrectReEnter = password.value === password1.value && password1.value !== '';
 
-    const isButtonDisabled = !password.inputValid || !password.inputValid || isPasswordCorrectReEnter;
+    const isButtonDisabled = !password.inputValid && !password.inputValid && !isPasswordCorrectReEnter;
 
     if (isLogin) {
         return <Redirect to={PATH.PROFILE}/>
@@ -61,6 +61,10 @@ export const SetNewPassword = () => {
         return (<div>
                 <ResponsePage typeOfPage={'success'}/>
                 </div>
+        )
+    }
+    if (isMessageSentStatus === 'end') {
+        return (<Redirect to={PATH.LOGIN}/>
         )
     }
 
@@ -86,8 +90,7 @@ export const SetNewPassword = () => {
                     }} value={password.value}
                                     label={'Enter new unique password'} type={'password'}/>
 
-                    <ErrorWindow isPasswordCorrectReEnter={isPasswordCorrectReEnter}/>
-                    {isPasswordCorrectReEnter}
+                    <ErrorWindow isPasswordCorrectReEnter={!isPasswordCorrectReEnter && password1.value!==''}/>
 
 
                     <SuperInputText onChange={password1.onChange} onBlur={() => {
@@ -96,7 +99,7 @@ export const SetNewPassword = () => {
                                     label={'Repeat your password'} type={'password'}/>
 
 
-                    <SuperButton disabled={isButtonDisabled} onClick={onClickHandler}
+                    <SuperButton disabled={!isPasswordCorrectReEnter} onClick={onClickHandler}
                                  style={{width: 280, marginTop: 80, marginBottom: 40}}>Create
                         new password</SuperButton>
                 </form>

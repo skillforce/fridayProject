@@ -52,7 +52,7 @@ export const SendMessage = (data: forgotPassDataType) => {
             })
             .finally(() => {
                     setTimeout(() => {
-                        dispatch(SetIsMessageSend('error'))
+                        dispatch(SetIsMessageSend('end'))
                     }, 2000)
                 }
             )
@@ -72,13 +72,19 @@ export const CreateNewPassword = (data: newPassDataType) => {
                 dispatch(SetErrorRecoveryPassMessage(errMsg))
                 dispatch(SetIsMessageSend('error'))
             })
+            .finally(() => {
+                    setTimeout(() => {
+                        dispatch(SetIsMessageSend('end'))
+                    }, 2000)
+                }
+            )
     }
 }
 
 
 //types
 
-export type isMessageSentStatusType = 'sent' | 'loading' | 'error'
+export type isMessageSentStatusType = 'sent' | 'loading' | 'error'|'end'
 
 export type setIsMessageSendType = ReturnType<typeof SetIsMessageSend>
 export type setErrorRecoveryPassMessageType = ReturnType<typeof SetErrorRecoveryPassMessage>

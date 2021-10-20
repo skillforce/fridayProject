@@ -1,3 +1,7 @@
+import {profileAPI, SetProfileType} from '../../dal/Api';
+import {Dispatch} from 'redux';
+import {logInTrue, setIsLoading, setLoginError} from './login-reducer';
+
 const SET_PROFILE = 'ProfileReducer/SET_PROFILE';
 
 export type ProfileResponseType = {
@@ -35,6 +39,28 @@ let InitialState = {
 }
 
 export type InitialStateLoginType = typeof InitialState
+
+export const EditProfileTC = (Data: SetProfileType) => {
+    return (dispatch: Dispatch) => {
+        dispatch(setIsLoading(true))
+        profileAPI.setProfile(Data)
+            .then(res => {
+                    dispatch(setProfile(res.data.updatedUser))
+                    dispatch(logInTrue(true))
+                }
+            )
+            .catch(error => {
+                const errMsg = error.response ? error.response.data.error
+                    : (error.message + ', more details in the console');
+                dispatch(setLoginError(errMsg))
+            })
+            .finally(() => {
+                    dispatch(setIsLoading(false))
+                }
+            )
+    }
+}
+
 
 export const ProfileReducer = (state: InitialStateLoginType = InitialState, action: ProfileReducerActionType): InitialStateLoginType => {
     switch (action.type) {
