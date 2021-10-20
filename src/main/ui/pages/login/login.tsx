@@ -10,6 +10,7 @@ import {PATH} from '../../routes/Routes';
 import {setIsValidReg} from '../../../bll/redusers/registration-reducer';
 import {ErrorWindow} from '../../common/ErrorWindow/ErrorWindow';
 import {Preloader} from '../../common/Preloader/Preloader';
+import {SetIsMessageSend} from '../../../bll/redusers/recoverPass-reducer';
 
 
 type ValidatorType = {
@@ -144,6 +145,11 @@ const Login = () => {
 
     }
 
+
+    const onClickForgotHandler=()=>{
+        dispatch(SetIsMessageSend('error')) //чтобы если вдруг после редиректа на логин из восстановления пароля пользователь решит снова зайти на забыл пароль
+    }
+
     const signUpClickHandler = () => {
         dispatch(setIsValidReg(false))
     }
@@ -199,7 +205,7 @@ const Login = () => {
                     <input value={rememberMe.value} onChange={rememberMe.onChange} type={'checkbox'}/> remember me
 
 
-                    <NavLink className={cn.linkforgot} to={PATH.RECOVER_PASS}>Forgot password</NavLink>
+                    <NavLink onClick={onClickForgotHandler} className={cn.linkforgot} to={PATH.RECOVER_PASS}>Forgot password</NavLink>
 
 
                     <div><NavLink onClick={signUpClickHandler} className={cn.linkforgot} to={PATH.REGISTRATION}>Sign

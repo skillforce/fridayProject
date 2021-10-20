@@ -56,6 +56,9 @@ const RecoverPass = () => {
     if (isMessageSentStatus === 'sent') {
         return <ResponsePage typeOfPage={'sent'} email={email.value}/>
     }
+    if (isMessageSentStatus === 'end') {
+        return <Redirect to={PATH.LOGIN}/>
+    }
 
 
     return (
