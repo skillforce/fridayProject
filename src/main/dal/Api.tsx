@@ -54,7 +54,7 @@ export const authAPI = {
         return instance.post('/auth/register', data);
     },
     authMe() {
-        return instance.post('/auth/me');
+        return instance.post('auth/me');
     },
     forgotPass(data:forgotPassDataType) {
         return instanceHeroky.post('/auth/forgot',data);

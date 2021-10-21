@@ -28,7 +28,7 @@ const RecoverPass = () => {
             from: 'test-front-admin <skillforce@mail.ru>',
             message: `<div style="background-color: lime; padding: 15px">	
 	        password recovery link: 
-	        <a href='http://localhost:3000/#/set-new-password/$token$'>
+	        <a href='https://skillforce.github.io/fridayProject/#/set-new-password/$token$'>
 	        link</a></div>`
         }
         dispatch(SendMessage(message))
