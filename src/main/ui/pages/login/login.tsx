@@ -186,14 +186,21 @@ const Login = () => {
                         password.onBlur(true)
                     }} value={password.value}
                                     label={'Password'} type={'password'}/>
+                    <div className={cn.overforgot}>
+                        {/*<div style={{display: 'flex', color: '#21268F', fontSize: '14px'}}>*/}
+                        {/*    <input value={rememberMe.value} onChange={rememberMe.onChange} type={'checkbox'}/> <span>Remember*/}
+                        {/*    me</span>*/}
+                        {/*</div>*/}
+                        <div>
+                            <NavLink className={cn.linkforgot} to={'./#/recPassword'}>Forgot password</NavLink>
+                        </div>
+                    </div>
 
 
-                    <input value={rememberMe.value} onChange={rememberMe.onChange} type={'checkbox'}/> remember me
-
-
-                    <NavLink className={cn.linkforgot} to={'./#/recPassword'}>Forgot password</NavLink>
                     <SuperButton onClick={onClickHandler} disabled={isLoginDisabled}
                                  style={{width: 280, marginTop: 80, marginBottom: 40}}>Login</SuperButton>
+
+
 
 
                 </form>
