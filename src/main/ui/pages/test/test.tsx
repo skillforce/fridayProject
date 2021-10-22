@@ -90,7 +90,7 @@ const Test = () => {
                         Pack list Petr's
                     </div>
                     <div className={s.inp}>
-                        <SuperInputText placeholder="Search"/>
+                        <SuperInputText label={'Search'} />
                     </div>
                     <table className={s.mainTab}>
                         <thead>
