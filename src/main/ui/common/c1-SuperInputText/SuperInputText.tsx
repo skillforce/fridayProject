@@ -47,14 +47,6 @@ const SuperInputText: React.FC<SuperInputTextPropsType> = (
 
 
     return (
-        // <input
-        //     type={'text'}
-        //     onChange={onChangeCallback}
-        //     onKeyPress={onKeyPressCallback}
-        //     className={finalInputClassName}
-        //     placeholder={error}
-        //     {...restProps} // отдаём инпуту остальные пропсы если они есть (value например там внутри)
-        // />
 
     <div className={cn.group}>
         <input

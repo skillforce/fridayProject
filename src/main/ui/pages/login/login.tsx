@@ -4,9 +4,13 @@ import SuperInputText from '../../common/c1-SuperInputText/SuperInputText';
 import {NavLink, Redirect} from 'react-router-dom';
 import SuperButton from '../../common/c2-SuperButton/SuperButton';
 import {useDispatch, useSelector} from 'react-redux';
-import {logInTC} from '../../../bll/redusers/login-reducer';
+import {logInTC, setLoginError} from '../../../bll/redusers/login-reducer';
 import {AppStoreType} from '../../../bll/store/store';
 import {PATH} from '../../routes/Routes';
+import {setIsValidReg} from '../../../bll/redusers/registration-reducer';
+import {ErrorWindow} from '../../common/ErrorWindow/ErrorWindow';
+import {Preloader} from '../../common/Preloader/Preloader';
+import {SetIsMessageSend} from '../../../bll/redusers/recoverPass-reducer';
 
 
 type ValidatorType = {
@@ -43,7 +47,6 @@ const useValidator = (value: any, validator: ValidatorType) => {
                     break;
             }
         }
-
     }, [value])
 
 
@@ -68,10 +71,12 @@ const useValidator = (value: any, validator: ValidatorType) => {
 }
 
 
-const useInput = (initialValue: any, validator: ValidatorType) => {
+export const useInput = (initialValue: any, validator: ValidatorType) => {
     const [value, setValue] = useState(initialValue);
     const [touched, setTouched] = useState(false);
+
     const valid = useValidator(value, validator)
+
     const onChange = (e: ChangeEvent<HTMLInputElement> | any) => {
         if (e.hasOwnProperty('target')) {
             setValue(e.target.value)
@@ -94,33 +99,27 @@ const useInput = (initialValue: any, validator: ValidatorType) => {
 
 }
 
-
 const Login = () => {
 
     const email = useInput('', {isEmpty: true, minLength: 3, maxLength: 50, isValidEmail: false});
-    const password = useInput('', {isEmpty: true, minLength: 5, maxLength: 20});
-    const rememberMe = useInput(false, {isEmpty: true, minLength: 5, maxLength: 20});
+    const password = useInput('', {isEmpty: true, minLength: 7, maxLength: 20});
+    const rememberMe = useInput(false, {isEmpty: true, minLength: 7, maxLength: 20});
 
-    const isEmptyEmailMsg = email.touched && email.isEmpty ?
-        <div style={{color: 'red'}}>Input should be stuffed</div> : '';
-    const isEmptyPassMsg = password.touched && password.isEmpty ?
-        <div style={{color: 'red'}}>Input should be stuffed</div> : ''; //проверка на пустоту
+    const isEmptyEmailMsg = email.touched && email.isEmpty;
+    const isEmptyPassMsg = password.touched && password.isEmpty
+    //проверка на пустоту
 
-    const minLengthEmailMsg = email.touched && email.minLengthError ?
-        <div style={{color: 'red'}}>Minimal length of email should be more than 3 symbols</div> : '';
-    const minLengthPassMsg = password.touched && password.minLengthError ?
-        <div style={{color: 'red'}}>Minimal length of password should be more than 8 symbols</div> : '';
+    const minLengthEmailMsg = email.touched && email.minLengthError;
+    const minLengthPassMsg = password.touched && password.minLengthError;
     // проверка на минимальную длинну
 
-    const isValidEmailMsg = email.touched && email.isValidEmailError ?
-        <div style={{color: 'red'}}>Invalid email</div> : '';
-    const maxLengthPassMsg = password.touched && password.maxLengthError ?
-        <div style={{color: 'red'}}>Maximal length of password should be low than 20 symbols</div> : '';
+    const isValidEmailMsg = email.touched && email.isValidEmailError;
+    const maxLengthPassMsg = password.touched && password.maxLengthError;
     // проверка на валидность имейла и максимальную длинну пароля
 
 
     const isLoginDisabled = !email.inputValid || !password.inputValid;
-//отключаем кнопку если хоть одна ошибка есть
+    //отключаем кнопку если хоть одна ошибка есть
 
     const dispatch = useDispatch();
 
@@ -146,8 +145,22 @@ const Login = () => {
     }
 
 
+    const onClickForgotHandler=()=>{
+        dispatch(SetIsMessageSend('error')) //чтобы если вдруг после редиректа на логин из восстановления пароля пользователь решит снова зайти на забыл пароль
+    }
+
+    const signUpClickHandler = () => {
+        dispatch(setIsValidReg(false))
+    }
+
+
+    if (email.touched || email.value || password.touched || password.value) {
+        dispatch(setLoginError(''))
+    }
+
+
     if (isLoading) {
-        return <h1>...loading</h1>
+        return <Preloader/>
     }
 
 
@@ -166,41 +179,41 @@ const Login = () => {
                     Login
                 </div>
                 <form action="">
-                    {ErrorRequestMsg && <div>{ErrorRequestMsg}</div>}
+                    {ErrorRequestMsg && <div style={{color:'red'}}>{ErrorRequestMsg}</div>}
 
-                    {isEmptyEmailMsg}
-                    {minLengthEmailMsg}
-                    {isValidEmailMsg}
+
+                    <ErrorWindow isEmptyEmailMsg={isEmptyEmailMsg} minLengthEmailMsg={minLengthEmailMsg}
+                                 isValidEmailMsg={isValidEmailMsg}/>
+
 
                     <SuperInputText onChange={email.onChange} onBlur={() => {
                         email.onBlur(true)
                     }} value={email.value}
                                     label={'Email'}/>
 
+                    <ErrorWindow isEmptyPassMsg={isEmptyPassMsg} minLengthPassMsg={minLengthPassMsg}
+                                 maxLengthPassMsg={maxLengthPassMsg}/>
 
-                    {isEmptyPassMsg}
-                    {minLengthPassMsg}
-                    {maxLengthPassMsg}
 
                     <SuperInputText onChange={password.onChange} onBlur={() => {
                         password.onBlur(true)
                     }} value={password.value}
                                     label={'Password'} type={'password'}/>
-                    <div className={cn.overforgot}>
-                        {/*<div style={{display: 'flex', color: '#21268F', fontSize: '14px'}}>*/}
-                        {/*    <input value={rememberMe.value} onChange={rememberMe.onChange} type={'checkbox'}/> <span>Remember*/}
-                        {/*    me</span>*/}
-                        {/*</div>*/}
-                        <div>
-                            <NavLink className={cn.linkforgot} to={'./#/recPassword'}>Forgot password</NavLink>
-                        </div>
-                    </div>
+
+
+                    <input value={rememberMe.value} onChange={rememberMe.onChange} type={'checkbox'}/> remember me
+
+
+                    <NavLink onClick={onClickForgotHandler} className={cn.linkforgot} to={PATH.RECOVER_PASS}>Forgot password</NavLink>
+
+
+                    <div><NavLink onClick={signUpClickHandler} className={cn.linkforgot} to={PATH.REGISTRATION}>Sign
+                        up</NavLink></div>
+                    {/*Если пользователь который только что зарегался решит еще раз зарегаться нам нужно откатить IsValidRec в registration reducer*/}
 
 
                     <SuperButton onClick={onClickHandler} disabled={isLoginDisabled}
                                  style={{width: 280, marginTop: 80, marginBottom: 40}}>Login</SuperButton>
-
-
 
 
                 </form>

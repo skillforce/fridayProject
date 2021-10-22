@@ -1,5 +1,6 @@
 import {Dispatch} from 'redux';
 import {authAPI, RequestDataType} from '../../dal/Api';
+import {setProfile} from './profile-reducer';
 
 
 const LOGIN_USER_TRUE = 'LoginPageReducer/LOGIN_TRUE';
@@ -42,6 +43,7 @@ export const logInTC = (requestData: RequestDataType) => {
         dispatch(setIsLoading(true))
         authAPI.login(requestData)
             .then(res => {
+                    dispatch(setProfile(res.data))
                     dispatch(logInTrue(true))
                 }
             )
@@ -55,10 +57,40 @@ export const logInTC = (requestData: RequestDataType) => {
                     dispatch(setIsLoading(false))
                 }
             )
-
-
     }
+}
+export const logOutTC = () => {
+    return (dispatch: Dispatch) => {
+        dispatch(setIsLoading(true))
+        authAPI.logOut()
+            .then(res => {
 
+                    dispatch(setProfile({
+                        _id: null,
+                        email: null,
+                        name: null,
+                        avatar: null,
+                        publicCardPacksCount: null,
+                        created: null,
+                        updated: null,
+                        isAdmin: null,
+                        verified: null,
+                        rememberMe: null,
+                        error: null
+                    }))
+                dispatch(logInTrue(false))
+                }
+            )
+            .catch(error => {
+                const errMsg = error.response ? error.response.data.error
+                    : (error.message + ', more details in the console');
+                dispatch(setLoginError(errMsg))
+            })
+            .finally(() => {
+                    dispatch(setIsLoading(false))
+                }
+            )
+    }
 }
 
 //types
