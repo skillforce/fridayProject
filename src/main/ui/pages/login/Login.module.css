@@ -23,7 +23,6 @@
 }
 .linkforgot {
     font-size: 14px;
-    float: right;
     text-decoration: none;
     color: #21268F;
     margin-top: 20px;
@@ -31,3 +30,13 @@
 .linkforgot:hover {
     text-decoration: underline;
 }
+.overforgot {
+    display: flex;
+    justify-content: space-between;
+}
+
+
+
+
+
+
