@@ -25,7 +25,7 @@ const RecoverPass = () => {
     const onClickHandler = () => {
         const message = {
             email: email.value,
-            from: 'test-front-admin <skillforce@mail.ru>',
+            from: 'tablet-cards-front-admin <skillforce@mail.ru>',
             message: `<div style="background-color: lime; padding: 15px">	
 	        password recovery link: 
 	        <a href='https://skillforce.github.io/fridayProject/#/set-new-password/$token$'>
@@ -56,6 +56,9 @@ const RecoverPass = () => {
     if (isMessageSentStatus === 'sent') {
         return <ResponsePage typeOfPage={'sent'} email={email.value}/>
     }
+
+
+
     if (isMessageSentStatus === 'end') {
         return <Redirect to={PATH.LOGIN}/>
     }

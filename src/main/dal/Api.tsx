@@ -5,7 +5,7 @@ const settings = {
     withCredentials: true,
 }
 const instance = axios.create({
-    baseURL: 'https://neko-back.herokuapp.com/2.0',
+    baseURL: 'http://localhost:7542/2.0/',
     ...settings
 })
 
@@ -39,6 +39,16 @@ export type SetProfileType = {
     avatar: string
 }
 
+export type ParamsGetCardsType ={
+    packName?:string,
+    min?:number
+    max?:number
+    sortPacks?:any
+    page?:number
+    pageCount?:number
+    user_id?:any
+}
+
 
 
 
@@ -66,6 +76,15 @@ export const authAPI = {
 
 export const profileAPI ={
     setProfile(data:SetProfileType){
-        return instanceHeroky.put('/auth/me',data);
+        return instance.put('/auth/me',data);
     }
+}
+
+
+export const CardsPackAPI ={
+    getCards(params:ParamsGetCardsType){
+        const{packName,min,max,sortPacks,page,pageCount,user_id}=params
+        return  instance.get('/cards/pack',{params:{packName,min,max,sortPacks,page,pageCount,user_id}})
+    }
+
 }

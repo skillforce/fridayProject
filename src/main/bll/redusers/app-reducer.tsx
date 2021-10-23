@@ -42,7 +42,9 @@ export const AuthMe = () => {
             .catch(error => {
                 const errMsg = error.response ? error.response.data.error
                     : (error.message + ', more details in the console');
-                dispatch(setLoginError(errMsg))
+                if(errMsg!='you are not authorized /ᐠ-ꞈ-ᐟ\\') {
+                    dispatch(setLoginError(errMsg))
+                }
                 dispatch(SetIsInitialized('notInitialized'))
             })
     }

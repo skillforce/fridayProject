@@ -9,6 +9,7 @@ import thunkMiddleware from 'redux-thunk'
 import {composeWithDevTools} from 'redux-devtools-extension';
 import ProfileReducer from '../redusers/profile-reducer';
 import {AppReducer} from '../redusers/app-reducer';
+import TabletReducer from '../redusers/tablet-reducer';
 
 
 const reducers = combineReducers({
@@ -19,7 +20,8 @@ const reducers = combineReducers({
     registration: RegistrationReducer,
     error404: Error404Reducer,
     profile: ProfileReducer,
-    app:AppReducer
+    app:AppReducer,
+    tablet:TabletReducer
 })
 
 

@@ -5,7 +5,7 @@ import Login from '../pages/login/login';
 import Profile from '../pages/profile/profile';
 import RecoverPass from '../pages/recoverPass/recoverPass';
 import Registration from '../pages/registration/registration';
-import Test from '../pages/test/test';
+import TabletCards from '../pages/tablet-cards/tablet-cards';
 import SetNewPassword from '../pages/setNewPassword/setNewPassword';
 import React from 'react';
 
@@ -15,7 +15,7 @@ export const PATH = {
     PROFILE: '/profile',
     RECOVER_PASS: '/recPassword',
     REGISTRATION: '/reg',
-    TEST: '/test',
+    TEST: '/tablet-cards',
     CREATE_NEW_PASS:'/set-new-password/:token'
 }
 
@@ -30,7 +30,7 @@ export const Routes = () => {
                 <Route path={PATH.PROFILE} render={() => <Profile/>}/>
                 <Route path={PATH.RECOVER_PASS} render={() => <RecoverPass/>}/>
                 <Route path={PATH.REGISTRATION} render={() => <Registration/>}/>
-                <Route path={PATH.TEST} render={() => <Test/>}/>
+                <Route path={PATH.TEST} render={() => <TabletCards/>}/>
                 <Route path={PATH.CREATE_NEW_PASS} render={() => <SetNewPassword/>}/>
 
                 <Route render={() => <Error404/>}/>
