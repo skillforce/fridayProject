@@ -1,0 +1,28 @@
+.btnGroup {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 10px 0;
+}
+
+.page {
+    border: 2px solid antiquewhite;
+    border-radius: 5px;
+    margin: 5px;
+    padding: 2px 5px;
+    background-color: #999999;
+    color: white;
+    cursor: pointer;
+}
+
+.pageSelect {
+    border: 2px solid antiquewhite;
+    font-weight: bold;
+    font-size: 18px;
+    border-radius: 45px;
+    margin: 5px;
+    padding: 2px 5px;
+    background-color: #999999;
+    color: #ffbebe;
+    cursor: pointer;
+}

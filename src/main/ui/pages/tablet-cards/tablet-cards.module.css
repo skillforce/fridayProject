@@ -18,7 +18,7 @@
     margin: 0 auto;
     margin-top: 25px;
     display: flex;
-    height: 700px;
+    height: 800px;
     margin-bottom: 100px;
     background: white;
     border-radius: 10px;
@@ -112,6 +112,14 @@
 .mainTab tbody td button {
     padding: 5px 25px;
     font-size: 13px;
+}
+
+
+.rangeValues{
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    margin-bottom: 20px;
 }
 
 
