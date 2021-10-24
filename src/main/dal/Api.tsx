@@ -10,7 +10,7 @@ const instance = axios.create({
 })
 
 const instanceHeroky = axios.create({
-    baseURL: "https://neko-back.herokuapp.com/2.0",
+    baseURL: 'https://neko-back.herokuapp.com/2.0',
     ...settings
 })
 
@@ -28,7 +28,7 @@ export type SignUpDataRequestType = {
 export type forgotPassDataType = {
     email: string
     from: string
-    message:string
+    message: string
 }
 export type newPassDataType = {
     password: string
@@ -39,18 +39,24 @@ export type SetProfileType = {
     avatar: string
 }
 
-export type ParamsGetCardsType ={
-    packName?:string,
-    min?:number
-    max?:number
-    sortPacks?:any
-    page?:number
-    pageCount?:number
-    user_id?:any
+export type ParamsGetCardsType = {
+    packName?: string,
+    min?: number
+    max?: number
+    sortPacks?: any
+    page?: number
+    pageCount?: number
+    user_id?: any
+}
+export type ParamsAddNewCardsType = {
+    cardsPack:CardsPackType
 }
 
-
-
+export type CardsPackType ={
+    name?: string,
+    deckCover?: string
+    privated?:boolean
+}
 
 
 export const authAPI = {
@@ -66,25 +72,28 @@ export const authAPI = {
     authMe() {
         return instance.post('auth/me');
     },
-    forgotPass(data:forgotPassDataType) {
-        return instanceHeroky.post('/auth/forgot',data);
+    forgotPass(data: forgotPassDataType) {
+        return instanceHeroky.post('/auth/forgot', data);
     },
-    setNewPass(data:newPassDataType) {
-        return instanceHeroky.post('/auth/set-new-password',data);
+    setNewPass(data: newPassDataType) {
+        return instanceHeroky.post('/auth/set-new-password', data);
     },
 }
 
-export const profileAPI ={
-    setProfile(data:SetProfileType){
-        return instance.put('/auth/me',data);
+export const profileAPI = {
+    setProfile(data: SetProfileType) {
+        return instance.put('/auth/me', data);
     }
 }
 
 
-export const CardsPackAPI ={
-    getCards(params:ParamsGetCardsType){
-        const{packName,min,max,sortPacks,page,pageCount,user_id}=params
-        return  instance.get('/cards/pack',{params:{packName,min,max,sortPacks,page,pageCount,user_id}})
+export const CardsPackAPI = {
+    getCards(params: ParamsGetCardsType) {
+        const {packName, min, max, sortPacks, page, pageCount, user_id} = params
+        return instance.get('/cards/pack', {params: {packName, min, max, sortPacks, page, pageCount, user_id}})
+    },
+    addNewCards(cardsPack: CardsPackType) {
+        return instance.post('/cards/pack',{cardsPack:{...cardsPack}})
     }
 
 }
