@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import s from './Paginator.module.css';
 import {useDispatch, useSelector} from 'react-redux';
 import {AppStoreType} from '../../../../bll/store/store';
-import {SetCurrentPage} from '../../../../bll/redusers/tablet-reducer';
+import {SetCurrentPage, SetPageForSearchMode} from '../../../../bll/redusers/tablet-reducer';
 
 
 const {page, pageSelect, btnGroup} = s;
@@ -12,18 +12,21 @@ type PaginatorPropsType = {
     totalItemsCount: number
     pageSize: number
     currentPage?: number
+    searchMode:boolean
+    pageForSearchMode:number
 }
 
 
 const Paginator = (props:PaginatorPropsType) => {
-    const {totalItemsCount, pageSize, currentPage} = props;
+    const {totalItemsCount, pageSize, currentPage,searchMode,pageForSearchMode} = props;
 
     const dispatch = useDispatch();
     const portionSize=10;
 
 
     const onPageChanged=(p:number)=>{
-        dispatch(SetCurrentPage(p))
+        {!searchMode && dispatch(SetCurrentPage(p))}
+        {searchMode&& dispatch(SetPageForSearchMode(p-1))}
     }
 
     let pagesCount = Math.ceil(totalItemsCount / pageSize);
@@ -41,6 +44,8 @@ const Paginator = (props:PaginatorPropsType) => {
     const rightPortionPageNumber = portionNumber * portionSize;
 
 
+
+
     return (
 
         <div className={btnGroup}>
@@ -51,7 +56,7 @@ const Paginator = (props:PaginatorPropsType) => {
 
             {allPages .filter(t=>t>=leftPortionPageNumber && t<=rightPortionPageNumber)
                 .map((p)=>{
-                    return <span className={currentPage === p ? pageSelect : page}
+                    return <span className={searchMode? pageForSearchMode===p-1? pageSelect : page: currentPage === p ? pageSelect : page}
                                  key={p}
                                  onClick={()=>{onPageChanged(p)}}>{p}</span>
                 })}

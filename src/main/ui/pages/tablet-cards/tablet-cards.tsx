@@ -6,7 +6,7 @@ import user from '../../../../assets/img/user.png'
 import {useDispatch, useSelector} from 'react-redux';
 import {
     getCarsPack,
-    InitialStateTabletType, PostCards, SearchTextType,
+    InitialStateTabletType, PostCards, SearchCorrectCards, SearchTextType,
     SetMinMaxCardsCurrent, SetSearchedBy, SetSearchText, SetSortStatus,
     SortPackType
 } from '../../../bll/redusers/tablet-reducer';
@@ -38,7 +38,7 @@ const TabletCards = () => {
     const [selectedParams, setOptionParams] = useState<SearchTextType>(selectParamsOptions[0]);
 
 
-    const {cardPacks, currentPage, cardPacksTotalCount, pageCount, minCardsCount, maxCardsCount, sortStatus} = tablet
+    const {cardPacks, currentPage, cardPacksTotalCount, pageCount, minCardsCount, maxCardsCount, sortStatus,searchCardsArr,searchMode,pageForSearchMode} = tablet
 
     const dispatch = useDispatch();
 
@@ -56,7 +56,7 @@ const TabletCards = () => {
         }else if(sortBy){
             dispatch(SetSearchedBy(sortBy))
             dispatch(SetSearchText(search))
-            dispatch(getCarsPack(checkBoxValue))
+            dispatch(SearchCorrectCards(checkBoxValue))
         }
     }
 
@@ -174,7 +174,19 @@ const TabletCards = () => {
                         </tr>
                         </thead>
                         <tbody>
-                        {cardPacks.map(t =>
+
+                        {cardPacks && cardPacks.map(t =>
+                            <tr key={t._id}>
+                                <td>{t.name}</td>
+                                <td>{t.cardsCount}</td>
+                                <td>{t.updated ? new Date(t.updated).toLocaleDateString() : ''}</td>
+                                <td>{t.user_name}</td>
+                                <td style={{display: 'flex'}}><SuperButton>Learn</SuperButton>
+                                    {t.user_id === profile.profile._id && <SuperButton>del</SuperButton>}
+                                    {t.user_id === profile.profile._id && <SuperButton>update</SuperButton>}
+                                </td>
+                            </tr>)}
+                        { searchCardsArr && searchCardsArr[pageForSearchMode].map(t =>
                             <tr key={t._id}>
                                 <td>{t.name}</td>
                                 <td>{t.cardsCount}</td>
@@ -191,7 +203,7 @@ const TabletCards = () => {
                 </div>
 
             </div>
-            <Paginator totalItemsCount={cardPacksTotalCount} currentPage={currentPage} pageSize={pageCount}/>
+            <Paginator pageForSearchMode={pageForSearchMode} searchMode={searchMode} totalItemsCount={cardPacksTotalCount} currentPage={currentPage} pageSize={pageCount}/>
         </>
     );
 }
