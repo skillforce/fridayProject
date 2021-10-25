@@ -1,7 +1,8 @@
 import {Dispatch} from 'redux';
-import {CardsPackAPI, CardsPackType, ParamsAddNewCardsType} from '../../dal/Api';
-import {SetIsMessageSend} from './recoverPass-reducer';
+import {CardsPackAPI, CardsPackType} from '../../dal/Api';
 import {AppStoreType} from '../store/store';
+import {setIsLoading} from './login-reducer';
+import {setSignUpProgress} from './registration-reducer';
 
 
 const SET_TABLET_INFO = 'TabletReducer/SET_TABLET_INFO';
@@ -13,6 +14,10 @@ const SET_SEARCHED_BY = 'TabletReducer/SET_SEARCHED_BY';
 const SET_SEARCH_CARDS_ARR = 'TabletReducer/SET_SEARCH_CARDS_ARR';
 const SET_SEARCH_MODE = 'TabletReducer/SET_SEARCH_MODE';
 const SET_PAGE_FOR_SEARCH_MODE = 'TabletReducer/SET_PAGE_FOR_SEARCH_MODE';
+const SET_SEARCH_EMPTY = 'TabletReducer/SET_SEARCH_EMPTY';
+const SET_LOADING_STATUS = 'TabletReducer/SET_LOADING_STATUS';
+const SET_ERROR_TEXT = 'TabletReducer/SET_ERROR_TEXT';
+const SET_CHECK_BOX_VALUE = 'TabletReducer/SET_CHECK_BOX_VALUE';
 
 
 export const SetTabletInfo = (newTabletInfo: InitialStateTabletType) => ({
@@ -43,7 +48,7 @@ export const SetSearchedBy = (newStatus: SearchTextType) => ({
     type: 'TabletReducer/SET_SEARCHED_BY' as const,
     newStatus
 });
-export const SetSearchCardsArr = (newCards: cardType[]) => ({
+export const SetSearchCardsArr = (newCards: cardType[] | null) => ({
     type: 'TabletReducer/SET_SEARCH_CARDS_ARR' as const,
     newCards
 });
@@ -54,6 +59,22 @@ export const SetSearchMode = (newMode: boolean) => ({
 export const SetPageForSearchMode = (newPage: number) => ({
     type: 'TabletReducer/SET_PAGE_FOR_SEARCH_MODE' as const,
     newPage
+});
+export const SetSearchEmpty = (msg: string) => ({
+    type: 'TabletReducer/SET_SEARCH_EMPTY' as const,
+    msg
+});
+export const SetLoadingStatus = (newStatus: loadingStatusType) => ({
+    type: 'TabletReducer/SET_LOADING_STATUS' as const,
+    newStatus
+});
+export const SetErrorText = (newText: string) => ({
+    type: 'TabletReducer/SET_ERROR_TEXT' as const,
+    newText
+});
+export const SetCheckBoxValue = (newStatus: boolean) => ({
+    type: 'TabletReducer/SET_CHECK_BOX_VALUE' as const,
+    newStatus
 });
 
 
@@ -68,9 +89,13 @@ let InitialState = {
     currentPage: 1,
     sortStatus: '0updated' as SortPackType,
     searchText: '',
+    checkBoxValue: false,
     searchedBy: '' as SearchTextType,
     searchMode: false as boolean,
-    pageForSearchMode: 0 as number
+    pageForSearchMode: 0 as number,
+    searchEmpty: '' as string,
+    loadingStatus: 'success' as loadingStatusType,
+    errorText: '' as string
 }
 
 export type InitialStateTabletType = typeof InitialState
@@ -99,12 +124,20 @@ export const TabletReducer = (state: InitialStateTabletType = InitialState, acti
             return {...state, searchMode: action.newMode}
         case SET_PAGE_FOR_SEARCH_MODE :
             return {...state, pageForSearchMode: action.newPage}
+        case SET_SEARCH_EMPTY :
+            return {...state, searchEmpty: action.msg}
+        case SET_LOADING_STATUS :
+            return {...state, loadingStatus: action.newStatus}
+        case SET_ERROR_TEXT :
+            return {...state, errorText: action.newText}
+        case SET_CHECK_BOX_VALUE :
+            return {...state, checkBoxValue: action.newStatus}
         default:
             return state;
     }
 }
 
-export const getCarsPack = (withId: boolean = false) => {
+export const getCarsPack = () => {
     return (dispatch: Dispatch, getState: () => AppStoreType) => {
         const state = getState()
         const page = state.tablet.currentPage
@@ -112,28 +145,35 @@ export const getCarsPack = (withId: boolean = false) => {
         const min = state.tablet.minCardsCount
         const max = state.tablet.maxCardsCount
         const sortPacks = state.tablet.sortStatus
-        const searchText = state.tablet.searchText
-        const searchBy = state.tablet.searchedBy
-        const user_id = withId ? state.profile.profile._id : '';
+        const checkBoxValue =state.tablet.checkBoxValue
+        const user_id = checkBoxValue ? state.profile.profile._id : '';
 
-
+        dispatch(SetLoadingStatus('loading'));
         CardsPackAPI.getCards({page, pageCount, min, max, sortPacks, user_id})
             .then(res => {
                     dispatch(SetTabletInfo(res.data))
+                    dispatch(SetLoadingStatus('success'));
                 }
             )
             .catch(error => {
-                    console.log(error)
-                }
-            )
+                dispatch(SetErrorText(error.toString()))
+                dispatch(SetLoadingStatus('error'));
+                setTimeout(() => {
+                    dispatch(SetLoadingStatus('redirect'))
+                }, 3000)
+
+            })
+            .finally(() => {
+                setTimeout(() => {
+                    dispatch(SetLoadingStatus('success'))
+                }, 5000)
+            })
     }
 
 }
 
 
-
-
-export const SearchCorrectCards = (withId: boolean = false) => {
+export const SearchCorrectCards = () => {
     return (dispatch: Dispatch, getState: () => AppStoreType) => {
         const state = getState()
         const searchText = state.tablet.searchText
@@ -141,42 +181,69 @@ export const SearchCorrectCards = (withId: boolean = false) => {
         const min = state.tablet.minCardsCount
         const max = state.tablet.maxCardsCount
         const sortPacks = state.tablet.sortStatus
-        const user_id = withId ? state.profile.profile._id : '';
+        const checkBoxValue =state.tablet.checkBoxValue
+        const user_id = checkBoxValue ? state.profile.profile._id : '';
 
 
+        dispatch(SetLoadingStatus('loading'));
         CardsPackAPI.getCards({page: 1, pageCount: 4000, min, max, sortPacks, user_id})
             .then(res => {
                     if (searchBy === 'By name') {
                         const newCardsPacks = res.data.cardPacks.filter((t: cardType) => t.name.toLowerCase().indexOf(searchText.toLowerCase()) !== -1)
-                        const newCurrentPage = newCardsPacks.length
+                        const newTotalCount = newCardsPacks.length
                         const temp = []
-                        while (newCardsPacks.length > 0) {
-                            temp.push(newCardsPacks.splice(0, 10))
+                        if (newCardsPacks.length !== 0) {
+                            while (newCardsPacks.length > 0) {
+                                temp.push(newCardsPacks.splice(0, 10))
+                            }
+                            dispatch(SetSearchEmpty(''))
+                            dispatch(SetSearchMode(true))
+                            dispatch(SetSearchCardsArr(temp))
+                            dispatch(SetTabletInfo({...res.data, cardPacksTotalCount: newTotalCount, cardPacks: []}))
+
+                        } else {
+                            dispatch(SetSearchCardsArr(null))
+                            dispatch(SetTabletInfo({...res.data, cardPacksTotalCount: 1, cardPacks: []}))
+                            dispatch(SetSearchEmpty('not found by this name'))
+
                         }
-                        dispatch(SetSearchMode(true))
-                        dispatch(SetSearchCardsArr(temp))
-                        dispatch(SetTabletInfo({...res.data, cardPacksTotalCount: newCurrentPage, cardPacks: []}))
                     }
                     if (searchBy === 'By creator') {
                         const newCardsPacks = res.data.cardPacks.filter((t: cardType) => t.user_name.toLowerCase().indexOf(searchText.toLowerCase()) !== -1)
-                        const newCurrentPage = newCardsPacks.length
+                        const newTotalCount = newCardsPacks.length
                         const temp = []
-                        while (newCardsPacks.length > 0) {
-                            temp.push(newCardsPacks.splice(0, 10))
+                        if (newCardsPacks.length !== 0) {
+                            while (newCardsPacks.length > 0) {
+                                temp.push(newCardsPacks.splice(0, 10))
+                            }
+                            dispatch(SetSearchEmpty(''))
+                            dispatch(SetSearchMode(true))
+                            dispatch(SetSearchCardsArr(temp))
+                            dispatch(SetTabletInfo({...res.data, cardPacksTotalCount: newTotalCount, cardPacks: []}))
+
+                        } else {
+                            dispatch(SetSearchCardsArr(null))
+                            dispatch(SetTabletInfo({...res.data, cardPacksTotalCount: 1, cardPacks: []}))
+                            dispatch(SetSearchEmpty('not found by this creator'))
+
                         }
-                        dispatch(SetSearchMode(true))
-                        dispatch(SetSearchCardsArr(temp))
-                        dispatch(SetTabletInfo({...res.data, cardPacksTotalCount: newCurrentPage, cardPacks: []}))
                     }
-                    if (searchBy === '') {
-                        dispatch(SetTabletInfo(res.data))
-                    }
+
                 }
             )
             .catch(error => {
-                    console.log(error)
-                }
-            )
+                dispatch(SetErrorText(error.toString()))
+                dispatch(SetLoadingStatus('error'));
+                setTimeout(() => {
+                    dispatch(SetLoadingStatus('redirect'))
+                }, 3000)
+
+            })
+            .finally(() => {
+                setTimeout(() => {
+                    dispatch(SetLoadingStatus('success'))
+                }, 2000)
+            })
     }
 
 }
@@ -184,11 +251,71 @@ export const SearchCorrectCards = (withId: boolean = false) => {
 
 export const PostCards = (params: CardsPackType = {name: 'aaaaa'}) => {
     return (dispatch: Dispatch<any>, getState: () => AppStoreType) => {
+        const searchMode = getState().tablet.searchMode
         CardsPackAPI.addNewCards(params)
             .then(res => {
-                dispatch(getCarsPack())
+                {!searchMode && dispatch(getCarsPack())}
+                {searchMode && dispatch(SearchCorrectCards())}
             })
-            .catch(error => console.log(error))
+            .catch(error => {
+                dispatch(SetErrorText(error.toString()))
+                dispatch(SetLoadingStatus('error'));
+                setTimeout(() => {
+                    dispatch(SetLoadingStatus('redirect'))
+                }, 3000)
+
+            })
+            .finally(() => {
+                setTimeout(() => {
+                    dispatch(SetLoadingStatus('success'))
+                }, 5000)
+            })
+    }
+}
+export const DeleteCards = (cardId: string) => {
+    return (dispatch: Dispatch<any>, getState: () => AppStoreType) => {
+        const searchMode = getState().tablet.searchMode
+        CardsPackAPI.deleteCards(cardId)
+            .then(res => {
+                {!searchMode && dispatch(getCarsPack())}
+                {searchMode && dispatch(SearchCorrectCards())}
+            })
+            .catch(error => {
+                dispatch(SetErrorText(error.toString()))
+                dispatch(SetLoadingStatus('error'));
+                setTimeout(() => {
+                    dispatch(SetLoadingStatus('redirect'))
+                }, 3000)
+
+            })
+            .finally(() => {
+                setTimeout(() => {
+                    dispatch(SetLoadingStatus('success'))
+                }, 5000)
+            })
+    }
+}
+export const updateCards = (cardId: string) => {
+    return (dispatch: Dispatch<any>, getState: () => AppStoreType) => {
+        const searchMode = getState().tablet.searchMode
+        CardsPackAPI.updateCards(cardId)
+            .then(res => {
+                {!searchMode && dispatch(getCarsPack())}
+                {searchMode && dispatch(SearchCorrectCards())}
+            })
+            .catch(error => {
+                dispatch(SetErrorText(error.toString()))
+                dispatch(SetLoadingStatus('error'));
+                setTimeout(() => {
+                    dispatch(SetLoadingStatus('redirect'))
+                }, 3000)
+
+            })
+            .finally(() => {
+                setTimeout(() => {
+                    dispatch(SetLoadingStatus('success'))
+                }, 5000)
+            })
     }
 }
 
@@ -205,6 +332,10 @@ export type SetSearchedByType = ReturnType<typeof SetSearchedBy>
 export type SetSearchCardsArrType = ReturnType<typeof SetSearchCardsArr>
 export type SetSearchModeType = ReturnType<typeof SetSearchMode>
 export type SetPageForSearchModeType = ReturnType<typeof SetPageForSearchMode>
+export type SetSearchEmptyType = ReturnType<typeof SetSearchEmpty>
+export type SetLoadingStatusType = ReturnType<typeof SetLoadingStatus>
+export type SetErrorTextType = ReturnType<typeof SetErrorText>
+export type SetCheckBoxValueType = ReturnType<typeof SetCheckBoxValue>
 
 export type AllTabletActionType =
     SetTabletInfoType
@@ -214,7 +345,12 @@ export type AllTabletActionType =
     | SetSearchTextType
     | SetSearchedByType
     | SetSearchCardsArrType
-    | SetSearchModeType | SetPageForSearchModeType;
+    | SetSearchModeType
+    | SetPageForSearchModeType
+    | SetSearchEmptyType
+    | SetLoadingStatusType
+    | SetErrorTextType
+    |SetCheckBoxValueType
 
 export type cardType = {
     _id: string
@@ -233,6 +369,7 @@ export type cardType = {
 }
 export type SortPackType = '0cardsCount' | '1cardsCount' | '0name' | '1name' | '0updated' | '1updated'
 export type SearchTextType = 'By name' | 'By creator' | ''
+export type loadingStatusType = 'success' | 'error' | 'loading' | 'redirect'
 
 
 export default TabletReducer;

@@ -40,6 +40,7 @@ const Header = () => {
                     <NavLink to={PATH.REGISTRATION} className={header_nav}
                              activeClassName={header_nav_active}>registration</NavLink>
                     <NavLink to={PATH.TEST} className={header_nav} activeClassName={header_nav_active}>test</NavLink>
+                    <NavLink to={PATH.CARDS_TABLET} className={header_nav} activeClassName={header_nav_active}>cardsTablet</NavLink>
 
                 </div>
                 {isLogin && <div><SuperButton onClick={logOutClickHandler}>Logout</SuperButton></div>}

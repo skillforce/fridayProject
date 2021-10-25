@@ -1,13 +1,14 @@
 import React, {useState} from 'react';
 import {useSelector} from 'react-redux';
 import {AppStoreType} from '../../../bll/store/store';
-import {Redirect} from 'react-router-dom';
+import {NavLink, Redirect} from 'react-router-dom';
 import {PATH} from '../../routes/Routes';
 import {InitialStateLoginType} from '../../../bll/redusers/profile-reducer';
 import {Preloader} from '../../common/Preloader/Preloader';
 import cn from './profile.module.css';
 import EmptyAva from './EmptyAva.png'
 import EditProfile from './EditProfile/EditProfile';
+import SuperButton from '../../common/c2-SuperButton/SuperButton';
 
 
 const Profile = () => {
@@ -62,6 +63,7 @@ const Profile = () => {
                     <div>ID:{_id}</div>
                 </div>
                 <button onClick={()=>{onClickHandler(true)}}>Edit profile</button>
+                <SuperButton><NavLink to={PATH.CARDS_TABLET} style={{color:'white',textDecoration:'none'}}>going to cards tablet</NavLink></SuperButton>
             </div>}
              {isEditMode && <EditProfile onClickHandler={onClickHandler} isEditMode={isEditMode} />}
 

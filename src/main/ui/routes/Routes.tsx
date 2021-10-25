@@ -8,6 +8,7 @@ import Registration from '../pages/registration/registration';
 import TabletCards from '../pages/tablet-cards/tablet-cards';
 import SetNewPassword from '../pages/setNewPassword/setNewPassword';
 import React from 'react';
+import Card from '../pages/card/card';
 
 export const PATH = {
     ERROR_404: '/err404',
@@ -15,8 +16,9 @@ export const PATH = {
     PROFILE: '/profile',
     RECOVER_PASS: '/recPassword',
     REGISTRATION: '/reg',
-    TEST: '/tablet-cards',
-    CREATE_NEW_PASS:'/set-new-password/:token'
+    TEST: '/card/:token',
+    CREATE_NEW_PASS:'/set-new-password/:token',
+    CARDS_TABLET:'/cards-tablet'
 }
 
 
@@ -30,8 +32,9 @@ export const Routes = () => {
                 <Route path={PATH.PROFILE} render={() => <Profile/>}/>
                 <Route path={PATH.RECOVER_PASS} render={() => <RecoverPass/>}/>
                 <Route path={PATH.REGISTRATION} render={() => <Registration/>}/>
-                <Route path={PATH.TEST} render={() => <TabletCards/>}/>
+                <Route path={PATH.TEST} render={() => <Card/>}/>
                 <Route path={PATH.CREATE_NEW_PASS} render={() => <SetNewPassword/>}/>
+                <Route path={PATH.CARDS_TABLET} render={() => <TabletCards/>}/>
 
                 <Route render={() => <Error404/>}/>
 

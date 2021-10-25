@@ -10,6 +10,7 @@ import {composeWithDevTools} from 'redux-devtools-extension';
 import ProfileReducer from '../redusers/profile-reducer';
 import {AppReducer} from '../redusers/app-reducer';
 import TabletReducer from '../redusers/tablet-reducer';
+import CardReducer from '../redusers/card-reducer';
 
 
 const reducers = combineReducers({
@@ -21,7 +22,8 @@ const reducers = combineReducers({
     error404: Error404Reducer,
     profile: ProfileReducer,
     app:AppReducer,
-    tablet:TabletReducer
+    tablet:TabletReducer,
+    card:CardReducer
 })
 
 

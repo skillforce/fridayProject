@@ -13,13 +13,14 @@ const{autorization,form,hTit,tit,imgMailSent,infText,linkforgot}=s;
 
 type ResponsePagePropsType ={
     email?:string
-    typeOfPage:'sent'|'error'|'success'
+    typeOfPage:'sent'|'error'|'success'|'cardsError'
+    errorText?:string
 }
 
 
 
 export const ResponsePage =(props:ResponsePagePropsType)=>{
-    const{email,typeOfPage}=props;
+    const{email,typeOfPage,errorText}=props;
     return (
          <div className={autorization}>
              {typeOfPage==='sent'&& <div className={form}>
@@ -60,6 +61,17 @@ export const ResponsePage =(props:ResponsePagePropsType)=>{
                  </div>
                  <div className={imgMailSent}>
                      <img src={success} alt="success"/>
+                 </div>
+             </div>}
+             {typeOfPage==='cardsError'&& <div className={form}>
+                 <div className={hTit}>
+                     It-incubator
+                 </div>
+                 <div className={tit} style={{color:'red'}}>
+                     Some Error
+                 </div>
+                 <div className={infText}>
+                     Happen some error, await a few seconds...
                  </div>
              </div>}
         </div>)

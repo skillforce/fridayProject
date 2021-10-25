@@ -5,10 +5,20 @@ import s from './tablet-cards.module.css';
 import user from '../../../../assets/img/user.png'
 import {useDispatch, useSelector} from 'react-redux';
 import {
+    DeleteCards,
     getCarsPack,
-    InitialStateTabletType, PostCards, SearchCorrectCards, SearchTextType,
-    SetMinMaxCardsCurrent, SetSearchedBy, SetSearchText, SetSortStatus,
-    SortPackType
+    InitialStateTabletType,
+    PostCards,
+    SearchCorrectCards,
+    SearchTextType, SetCheckBoxValue,
+    SetMinMaxCardsCurrent,
+    SetSearchCardsArr,
+    SetSearchedBy,
+    SetSearchEmpty,
+    SetSearchMode,
+    SetSearchText,
+    SetSortStatus,
+    SortPackType, updateCards
 } from '../../../bll/redusers/tablet-reducer';
 import {AppStoreType} from '../../../bll/store/store';
 import {InitialStateLoginType} from '../../../bll/redusers/profile-reducer';
@@ -16,11 +26,17 @@ import Paginator from './Paginator/Paginator';
 import {Range} from 'rc-slider';
 import 'rc-slider/assets/index.css';
 import SuperSelect from '../../common/c5-SuperSelect/SuperSelect';
+import {Preloader} from '../../common/Preloader/Preloader';
+import {ResponsePage} from '../../common/ResponsePage/ResponsePage';
+import {NavLink, Redirect} from 'react-router-dom';
+import {PATH} from '../../routes/Routes';
+import Login from '../login/login';
 
 
-const TabletCards = () => {
 
+export const TabletCards = () => {
 
+    const isLogin = useSelector<AppStoreType, boolean>(state => state.login.logIn);
     const profile = useSelector<AppStoreType, InitialStateLoginType>(state => state.profile)
     const {
         _id,
@@ -30,41 +46,68 @@ const TabletCards = () => {
 
     const tablet = useSelector<AppStoreType, InitialStateTabletType>(state => state.tablet)
     const [rangeValue, setRangeValue] = useState<number[]>([tablet.minCardsCount, tablet.maxCardsCount])
-    const [checkBoxValue, setCheckBoxValue] = useState<boolean>(false)
     const [search, setSearch] = useState<string>('');
 
 
-    const selectParamsOptions:SearchTextType[] = ['By name', 'By creator']
+    const selectParamsOptions: SearchTextType[] = ['By name', 'By creator']
     const [selectedParams, setOptionParams] = useState<SearchTextType>(selectParamsOptions[0]);
 
 
-    const {cardPacks, currentPage, cardPacksTotalCount, pageCount, minCardsCount, maxCardsCount, sortStatus,searchCardsArr,searchMode,pageForSearchMode} = tablet
+    const {
+        cardPacks,
+        currentPage,
+        cardPacksTotalCount,
+        pageCount,
+        minCardsCount,
+        maxCardsCount,
+        sortStatus,
+        searchCardsArr,
+        searchMode,
+        pageForSearchMode,
+        searchEmpty,
+        checkBoxValue,
+        loadingStatus,
+        errorText
+    } = tablet
 
     const dispatch = useDispatch();
 
     useEffect(() => {
-        dispatch(getCarsPack(checkBoxValue))
-    }, [currentPage, minCardsCount, maxCardsCount, sortStatus, checkBoxValue])
+        {
+            !searchMode && dispatch(getCarsPack())
+        }
+        {
+            searchMode && dispatch(SearchCorrectCards())
+        }
+    }, [currentPage, minCardsCount, maxCardsCount, sortStatus, checkBoxValue, isLogin])
 
 
     const onChangeRangeHandler = (newRangeValue: number[]) => {
         setRangeValue(newRangeValue)
     }
-    const onClickSearchBtnHandler = (newMinMaxCurrent?: number[],sortBy?:SearchTextType) => {
-        if(newMinMaxCurrent) {
+    const onClickSearchBtnHandler = (newMinMaxCurrent?: number[], sortBy?: SearchTextType) => {
+        if (newMinMaxCurrent) {
             dispatch(SetMinMaxCardsCurrent(newMinMaxCurrent))
-        }else if(sortBy){
+        } else if (sortBy) {
             dispatch(SetSearchedBy(sortBy))
             dispatch(SetSearchText(search))
-            dispatch(SearchCorrectCards(checkBoxValue))
+            dispatch(SearchCorrectCards())
         }
     }
 
     const onSortBtnHandler = (newStatus: SortPackType) => {
         dispatch(SetSortStatus(newStatus))
     }
+    const onClickUpdateHandler = (cardId: string) => {
+        dispatch(updateCards(cardId))
+    }
+
+    const onDeleteCardsHandler = (cardId: string) => {
+        dispatch(DeleteCards(cardId))
+    }
+
     const onChangeCheckBoxStatus = () => {
-        setCheckBoxValue(!checkBoxValue)
+        dispatch(SetCheckBoxValue(!checkBoxValue))
     }
     const onHandlerSearch = (e: SyntheticEvent<HTMLInputElement>) => {
         setSearch(e.currentTarget.value);
@@ -72,13 +115,35 @@ const TabletCards = () => {
 
     const onAddNewCardsClickHandler = () => {
         dispatch(PostCards())
-        if (checkBoxValue) {
-            onChangeCheckBoxStatus()
-        }
+    };
 
+    const onAllPagesHandler = () => {
+        dispatch(SetSearchEmpty(''))
+        dispatch(SetSearchMode(false))
+        dispatch(SetSearchCardsArr(null))
+        dispatch(SetSortStatus('0updated'))
+        dispatch(getCarsPack())
+        setSearch('');
     };
 
 
+    if (!isLogin) {
+        return <Login/>
+    }
+
+    if (loadingStatus === 'loading') {
+        return <Preloader/>
+    }
+
+    if (loadingStatus === 'error') {
+        return <ResponsePage typeOfPage={'cardsError'} errorText={errorText}/>
+
+    }
+
+
+    if (loadingStatus === 'redirect') {
+        return <Redirect to={PATH.PROFILE}/>
+    }
 
 
     return (
@@ -87,7 +152,7 @@ const TabletCards = () => {
                 <div className={s.user}>
                     <div className={s.user_card}>
                         <div className={s.logo}>
-                            <img src={avatar ? avatar : user} alt=""/>
+                            <NavLink to={PATH.PROFILE}><img src={avatar ? avatar : user} alt=""/></NavLink>
                         </div>
                         <div className={s.name}>
                             {name}
@@ -126,12 +191,14 @@ const TabletCards = () => {
                         <input onChange={onChangeCheckBoxStatus} checked={checkBoxValue} type={'checkbox'}/>My cards
                     </div>
                     <div className={s.inp}>
-                        <div style={{display:'flex'}}>
+                        <div style={{display: 'flex'}}>
                             {selectedParams === 'By name' &&
                             <SuperInputText onChange={onHandlerSearch} value={search} label="Search by name"/>}
                             {selectedParams === 'By creator' &&
                             <SuperInputText onChange={onHandlerSearch} value={search} label="Search by creator"/>}
-                            <SuperButton onClick={() => onClickSearchBtnHandler(undefined,selectedParams)}>search</SuperButton>
+                            <SuperButton
+                                onClick={() => onClickSearchBtnHandler(undefined, selectedParams)}>search</SuperButton>
+                            {searchMode && <SuperButton onClick={onAllPagesHandler}>go to all</SuperButton>}
                         </div>
                         <SuperSelect onChangeOption={setOptionParams} options={selectParamsOptions}/>
 
@@ -173,37 +240,39 @@ const TabletCards = () => {
                             <th>Actions</th>
                         </tr>
                         </thead>
-                        <tbody>
-
+                        <tbody>{searchEmpty &&
+                        <div style={{margin: '60px', fontSize: '50px', color: 'red'}}>{searchEmpty}</div>}
                         {cardPacks && cardPacks.map(t =>
                             <tr key={t._id}>
                                 <td>{t.name}</td>
                                 <td>{t.cardsCount}</td>
                                 <td>{t.updated ? new Date(t.updated).toLocaleDateString() : ''}</td>
                                 <td>{t.user_name}</td>
-                                <td style={{display: 'flex'}}><SuperButton>Learn</SuperButton>
-                                    {t.user_id === profile.profile._id && <SuperButton>del</SuperButton>}
-                                    {t.user_id === profile.profile._id && <SuperButton>update</SuperButton>}
+                                <td style={{display: 'flex'}}><NavLink to={"/card/" + t._id}><SuperButton>Learn</SuperButton></NavLink>
+                                    {t.user_id === profile.profile._id &&
+                                    <SuperButton onClick={() => onDeleteCardsHandler(t._id)}>del</SuperButton>}
+                                    {t.user_id === profile.profile._id &&
+                                    <SuperButton onClick={() => onClickUpdateHandler(t._id)}>update</SuperButton>}
                                 </td>
                             </tr>)}
-                        { searchCardsArr && searchCardsArr[pageForSearchMode].map(t =>
+                        {searchCardsArr && searchCardsArr[pageForSearchMode].map(t =>
                             <tr key={t._id}>
                                 <td>{t.name}</td>
                                 <td>{t.cardsCount}</td>
                                 <td>{t.updated ? new Date(t.updated).toLocaleDateString() : ''}</td>
                                 <td>{t.user_name}</td>
                                 <td style={{display: 'flex'}}><SuperButton>Learn</SuperButton>
-                                    {t.user_id === profile.profile._id && <SuperButton>del</SuperButton>}
-                                    {t.user_id === profile.profile._id && <SuperButton>update</SuperButton>}
+                                    {t.user_id === profile.profile._id &&
+                                    <SuperButton onClick={() => onDeleteCardsHandler(t._id)}>del</SuperButton>}
+                                    {t.user_id === profile.profile._id &&
+                                    <SuperButton onClick={() => onClickUpdateHandler(t._id)}>update</SuperButton>}
                                 </td>
-                            </tr>)}
-                        </tbody>
+                            </tr>)}</tbody>
                     </table>
-
                 </div>
-
             </div>
-            <Paginator pageForSearchMode={pageForSearchMode} searchMode={searchMode} totalItemsCount={cardPacksTotalCount} currentPage={currentPage} pageSize={pageCount}/>
+            <Paginator pageForSearchMode={pageForSearchMode} searchMode={searchMode}
+                       totalItemsCount={cardPacksTotalCount} currentPage={currentPage} pageSize={pageCount}/>
         </>
     );
 }
