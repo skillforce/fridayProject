@@ -1,8 +1,6 @@
 import {Dispatch} from 'redux';
 import {CardsPackAPI, CardsPackType} from '../../dal/Api';
 import {AppStoreType} from '../store/store';
-import {setIsLoading} from './login-reducer';
-import {setSignUpProgress} from './registration-reducer';
 
 
 const SET_TABLET_INFO = 'TabletReducer/SET_TABLET_INFO';
@@ -145,14 +143,13 @@ export const getCarsPack = () => {
         const min = state.tablet.minCardsCount
         const max = state.tablet.maxCardsCount
         const sortPacks = state.tablet.sortStatus
-        const checkBoxValue =state.tablet.checkBoxValue
+        const checkBoxValue = state.tablet.checkBoxValue
         const user_id = checkBoxValue ? state.profile.profile._id : '';
 
         dispatch(SetLoadingStatus('loading'));
-        CardsPackAPI.getCards({page, pageCount, min, max, sortPacks, user_id})
+        const promise = CardsPackAPI.getCards({page, pageCount, min, max, sortPacks, user_id})
             .then(res => {
                     dispatch(SetTabletInfo(res.data))
-                    dispatch(SetLoadingStatus('success'));
                 }
             )
             .catch(error => {
@@ -163,11 +160,10 @@ export const getCarsPack = () => {
                 }, 3000)
 
             })
-            .finally(() => {
-                setTimeout(() => {
-                    dispatch(SetLoadingStatus('success'))
-                }, 5000)
-            })
+        Promise.all([promise]).then(res => setTimeout(() => {
+                dispatch(SetLoadingStatus('success'))
+            }, 2000)
+        )
     }
 
 }
@@ -181,12 +177,11 @@ export const SearchCorrectCards = () => {
         const min = state.tablet.minCardsCount
         const max = state.tablet.maxCardsCount
         const sortPacks = state.tablet.sortStatus
-        const checkBoxValue =state.tablet.checkBoxValue
+        const checkBoxValue = state.tablet.checkBoxValue
         const user_id = checkBoxValue ? state.profile.profile._id : '';
 
-
         dispatch(SetLoadingStatus('loading'));
-        CardsPackAPI.getCards({page: 1, pageCount: 4000, min, max, sortPacks, user_id})
+        const promise = CardsPackAPI.getCards({page: 1, pageCount: 4000, min, max, sortPacks, user_id})
             .then(res => {
                     if (searchBy === 'By name') {
                         const newCardsPacks = res.data.cardPacks.filter((t: cardType) => t.name.toLowerCase().indexOf(searchText.toLowerCase()) !== -1)
@@ -200,12 +195,14 @@ export const SearchCorrectCards = () => {
                             dispatch(SetSearchMode(true))
                             dispatch(SetSearchCardsArr(temp))
                             dispatch(SetTabletInfo({...res.data, cardPacksTotalCount: newTotalCount, cardPacks: []}))
-
+                            dispatch(SetLoadingStatus('success'));
                         } else {
+                            dispatch(SetSearchMode(true))
                             dispatch(SetSearchCardsArr(null))
+                            debugger
                             dispatch(SetTabletInfo({...res.data, cardPacksTotalCount: 1, cardPacks: []}))
                             dispatch(SetSearchEmpty('not found by this name'))
-
+                            dispatch(SetLoadingStatus('success'));
                         }
                     }
                     if (searchBy === 'By creator') {
@@ -220,12 +217,13 @@ export const SearchCorrectCards = () => {
                             dispatch(SetSearchMode(true))
                             dispatch(SetSearchCardsArr(temp))
                             dispatch(SetTabletInfo({...res.data, cardPacksTotalCount: newTotalCount, cardPacks: []}))
-
+                            dispatch(SetLoadingStatus('success'));
                         } else {
+                            dispatch(SetSearchMode(true))
                             dispatch(SetSearchCardsArr(null))
                             dispatch(SetTabletInfo({...res.data, cardPacksTotalCount: 1, cardPacks: []}))
                             dispatch(SetSearchEmpty('not found by this creator'))
-
+                            dispatch(SetLoadingStatus('success'));
                         }
                     }
 
@@ -239,11 +237,10 @@ export const SearchCorrectCards = () => {
                 }, 3000)
 
             })
-            .finally(() => {
-                setTimeout(() => {
-                    dispatch(SetLoadingStatus('success'))
-                }, 2000)
-            })
+        Promise.all([promise]).then(res => setTimeout(() => {
+                dispatch(SetLoadingStatus('success'))
+            }, 2000)
+        )
     }
 
 }
@@ -252,10 +249,15 @@ export const SearchCorrectCards = () => {
 export const PostCards = (params: CardsPackType = {name: 'aaaaa'}) => {
     return (dispatch: Dispatch<any>, getState: () => AppStoreType) => {
         const searchMode = getState().tablet.searchMode
-        CardsPackAPI.addNewCards(params)
+        dispatch(SetLoadingStatus('loading'));
+        const promise = CardsPackAPI.addNewCards(params)
             .then(res => {
-                {!searchMode && dispatch(getCarsPack())}
-                {searchMode && dispatch(SearchCorrectCards())}
+                {
+                    !searchMode && dispatch(getCarsPack())
+                }
+                {
+                    searchMode && dispatch(SearchCorrectCards())
+                }
             })
             .catch(error => {
                 dispatch(SetErrorText(error.toString()))
@@ -263,7 +265,6 @@ export const PostCards = (params: CardsPackType = {name: 'aaaaa'}) => {
                 setTimeout(() => {
                     dispatch(SetLoadingStatus('redirect'))
                 }, 3000)
-
             })
             .finally(() => {
                 setTimeout(() => {
@@ -274,11 +275,16 @@ export const PostCards = (params: CardsPackType = {name: 'aaaaa'}) => {
 }
 export const DeleteCards = (cardId: string) => {
     return (dispatch: Dispatch<any>, getState: () => AppStoreType) => {
+        dispatch(SetLoadingStatus('loading'));
         const searchMode = getState().tablet.searchMode
-        CardsPackAPI.deleteCards(cardId)
+        const promise = CardsPackAPI.deleteCards(cardId)
             .then(res => {
-                {!searchMode && dispatch(getCarsPack())}
-                {searchMode && dispatch(SearchCorrectCards())}
+                {
+                    !searchMode && dispatch(getCarsPack())
+                }
+                {
+                    searchMode && dispatch(SearchCorrectCards())
+                }
             })
             .catch(error => {
                 dispatch(SetErrorText(error.toString()))
@@ -300,8 +306,12 @@ export const updateCards = (cardId: string) => {
         const searchMode = getState().tablet.searchMode
         CardsPackAPI.updateCards(cardId)
             .then(res => {
-                {!searchMode && dispatch(getCarsPack())}
-                {searchMode && dispatch(SearchCorrectCards())}
+                {
+                    !searchMode && dispatch(getCarsPack())
+                }
+                {
+                    searchMode && dispatch(SearchCorrectCards())
+                }
             })
             .catch(error => {
                 dispatch(SetErrorText(error.toString()))
@@ -350,7 +360,7 @@ export type AllTabletActionType =
     | SetSearchEmptyType
     | SetLoadingStatusType
     | SetErrorTextType
-    |SetCheckBoxValueType
+    | SetCheckBoxValueType
 
 export type cardType = {
     _id: string

@@ -1,14 +1,7 @@
 import {Dispatch} from 'redux';
-import {CardAPI} from '../../dal/Api';
+import {CardAPI, newCardDataType, newUpdateCardDataType} from '../../dal/Api';
 import {AppStoreType} from '../store/store';
-import {
-    cardType,
-    loadingStatusType,
-    SearchTextType,
-    SetLoadingStatus, SetSearchCardsArr,
-    SetSearchEmpty, SetSearchMode, SetTabletInfo,
-    SortPackType
-} from './tablet-reducer';
+import {loadingStatusType} from './tablet-reducer';
 
 
 const SET_CARD_INFO = 'CardReducer/SET_CARD_INFO';
@@ -22,6 +15,8 @@ const SET_SEARCH_CARD_MODE = 'CardReducer/SET_SEARCH_CARD_MODE';
 const SET_SEARCH_EMPTY = 'CardReducer/SET_SEARCH_EMPTY';
 const SET_SEARCH_CARD_ARR = 'CardReducer/SET_SEARCH_CARD_ARR';
 const SET_PAGE_FOR_SEARCH_CARD_MODE = 'CardReducer/SET_PAGE_FOR_SEARCH_CARD_MODE';
+const SET_PAGE_COUNT = 'CardReducer/SET_PAGE_COUNT';
+const SET_ERROR_CARD_TEXT = 'CardReducer/SET_ERROR_CARD_TEXT';
 
 
 export const SetCardInfo = (newCardInfo: InitialStateCardType) => ({
@@ -69,6 +64,14 @@ export const SetPageForSearchCardMode = (newPage: number) => ({
     type: 'CardReducer/SET_PAGE_FOR_SEARCH_CARD_MODE' as const,
     newPage
 });
+export const SetPageCount = (newPage: number) => ({
+    type: 'CardReducer/SET_PAGE_COUNT' as const,
+    newPage
+});
+export const SetErrorCardText = (newText: string) => ({
+    type: 'CardReducer/SET_ERROR_CARD_TEXT' as const,
+    newText
+});
 
 
 let InitialState = {
@@ -88,6 +91,7 @@ let InitialState = {
     searchCardMode: false as boolean,
     searchCardEmpty: '' as string,
     pageForSearchCardMode: 0 as number,
+    errorCardText: '' as string
 }
 
 export type InitialStateCardType = typeof InitialState
@@ -116,6 +120,10 @@ export const CardReducer = (state: InitialStateCardType = InitialState, action: 
             return {...state, searchCardArr: action.newArr}
         case SET_PAGE_FOR_SEARCH_CARD_MODE :
             return {...state, pageForSearchCardMode: action.newPage}
+        case SET_PAGE_COUNT :
+            return {...state, pageCount: action.newPage}
+        case SET_ERROR_CARD_TEXT :
+            return {...state, errorCardText: action.newText}
         default:
             return state;
     }
@@ -131,12 +139,29 @@ export const getCard = (id: string) => {
         dispatch(SetLoadingCardStatus('loading'));
         CardAPI.getCards({cardsPack_id: id, page, pageCount, min: gradeValue[0], max: gradeValue[1], sortCards})
             .then(res => {
-                    dispatch(SetCardInfo(res.data))
-                    dispatch(SetLoadingCardStatus('success'));
+                    if (res.data.cards.length !== 0) {
+                        dispatch(SetSearchCardEmpty(''))
+                        dispatch(SetCardInfo(res.data))
+                        dispatch(SetLoadingCardStatus('success'));
+                    } else {
+                        dispatch(SetCardInfo({...res.data, cardsTotalCount: 1, cards: []}))
+                        dispatch(SetSearchCardEmpty('not found any cards'))
+                        dispatch(SetLoadingCardStatus('success'));
+                    }
                 }
             )
             .catch(error => {
-                console.log(error)
+                dispatch(SetErrorCardText(error.toString()))
+                dispatch(SetLoadingCardStatus('error'));
+                setTimeout(() => {
+                    dispatch(SetLoadingCardStatus('redirect'))
+                }, 3000)
+
+            })
+            .finally(() => {
+                setTimeout(() => {
+                    dispatch(SetLoadingCardStatus('success'))
+                }, 5000)
             })
     }
 
@@ -150,6 +175,7 @@ export const searchCard = (id: string) => {
         const sortCards = state.card.sortCards
         const searchedCardBy = state.card.searchedCardBy
         const searchCardText = state.card.searchCardText
+        const pageCount = state.card.pageCount
         dispatch(SetLoadingCardStatus('loading'));
         CardAPI.getCards({cardsPack_id: id, page: 1, pageCount: 100, min: gradeValue[0], max: gradeValue[1], sortCards})
             .then(res => {
@@ -164,12 +190,14 @@ export const searchCard = (id: string) => {
                             dispatch(SetSearchCardEmpty(''))
                             dispatch(SetSearchCardMode(true))
                             dispatch(SetSearchCardArr(temp))
-                            dispatch(SetCardInfo({...res.data, cardPacksTotalCount: newTotalCount, cards: []}))
+                            dispatch(SetCardInfo({...res.data, cardsTotalCount: newTotalCount, cards: []}))
                             dispatch(SetLoadingCardStatus('success'));
                         } else {
+                            dispatch(SetSearchCardMode(true))
                             dispatch(SetSearchCardArr(null))
-                            dispatch(SetCardInfo({...res.data, cardPacksTotalCount: 1, cardPacks: []}))
+                            dispatch(SetCardInfo({...res.data, cardsTotalCount: 1, cards: []}))
                             dispatch(SetSearchCardEmpty('not found by this question'))
+                            dispatch(SetLoadingCardStatus('success'));
 
                         }
                     }
@@ -184,23 +212,121 @@ export const searchCard = (id: string) => {
                             dispatch(SetSearchCardEmpty(''))
                             dispatch(SetSearchCardMode(true))
                             dispatch(SetSearchCardArr(temp))
-                            dispatch(SetCardInfo({...res.data, cardPacksTotalCount: newTotalCount, cards: []}))
-
+                            dispatch(SetCardInfo({...res.data, cardsTotalCount: newTotalCount, cards: []}))
+                            dispatch(SetLoadingCardStatus('success'));
                         } else {
+                            dispatch(SetSearchCardMode(true))
                             dispatch(SetSearchCardArr(null))
-                            dispatch(SetCardInfo({...res.data, cardPacksTotalCount: 1, cardPacks: []}))
+                            dispatch(SetCardInfo({...res.data, cardsTotalCount: 1, cards: []}))
                             dispatch(SetSearchCardEmpty('not found by this answer'))
-
+                            dispatch(SetLoadingCardStatus('success'));
                         }
                     }
 
                 }
             )
             .catch(error => {
-                console.log(error)
+                dispatch(SetErrorCardText(error.toString()))
+                dispatch(SetLoadingCardStatus('error'));
+                setTimeout(() => {
+                    dispatch(SetLoadingCardStatus('redirect'))
+                }, 3000)
+
+            })
+            .finally(() => {
+                setTimeout(() => {
+                    dispatch(SetLoadingCardStatus('success'))
+                }, 5000)
             })
     }
 
+}
+
+
+export const AddCard = (newCardParams: newCardDataType) => {
+    return (dispatch: Dispatch<any>, getState: () => AppStoreType) => {
+        dispatch(SetLoadingCardStatus('loading'));
+        const searchMode = getState().tablet.searchMode
+        CardAPI.addNewCards(newCardParams)
+            .then(res => {
+                {
+                    !searchMode && dispatch(getCard(newCardParams.cardsPack_id))
+                }
+                {
+                    searchMode && dispatch(searchCard(newCardParams.cardsPack_id))
+                }
+            })
+            .catch(error => {
+                dispatch(SetErrorCardText(error.toString()))
+                dispatch(SetLoadingCardStatus('error'));
+                setTimeout(() => {
+                    dispatch(SetLoadingCardStatus('redirect'))
+                }, 3000)
+
+            })
+            .finally(() => {
+                setTimeout(() => {
+                    dispatch(SetLoadingCardStatus('success'))
+                }, 5000)
+            })
+    }
+}
+export const UpdateCard = (newCardParams: newUpdateCardDataType, cardsPack_id: string) => {
+    return (dispatch: Dispatch<any>, getState: () => AppStoreType) => {
+        dispatch(SetLoadingCardStatus('loading'));
+        const searchMode = getState().tablet.searchMode
+        CardAPI.updateCard(newCardParams)
+            .then(res => {
+                {
+                    !searchMode && dispatch(getCard(cardsPack_id))
+                }
+                {
+                    searchMode && dispatch(searchCard(cardsPack_id))
+                }
+            })
+            .catch(error => {
+                dispatch(SetErrorCardText(error.toString()))
+                dispatch(SetLoadingCardStatus('error'));
+                setTimeout(() => {
+                    dispatch(SetLoadingCardStatus('redirect'))
+                }, 3000)
+
+            })
+            .finally(() => {
+                setTimeout(() => {
+                    dispatch(SetLoadingCardStatus('success'))
+                }, 5000)
+            })
+    }
+}
+
+export const DeleteCard = (cardId: string, cardsPack_id: string) => {
+    return (dispatch: Dispatch<any>, getState: () => AppStoreType) => {
+        dispatch(SetLoadingCardStatus('loading'));
+        const searchMode = getState().tablet.searchMode
+        CardAPI.deleteCard(cardId)
+            .then(res => {
+                {
+                    !searchMode && dispatch(getCard(cardsPack_id))
+                }
+                {
+                    searchMode && dispatch(searchCard(cardsPack_id))
+                }
+            })
+            .catch(error => {
+                dispatch(SetErrorCardText(error.toString()))
+                dispatch(SetLoadingCardStatus('error'));
+                setTimeout(() => {
+                    dispatch(SetLoadingCardStatus('redirect'))
+                }, 3000)
+
+            })
+            .finally(() => {
+                setTimeout(() => {
+                    dispatch(SetLoadingCardStatus('success'))
+                }, 5000)
+            })
+    }
 }
 
 
@@ -218,6 +344,8 @@ export type SetSearchCardModeType = ReturnType<typeof SetSearchCardMode>
 export type SetSearchCardEmptyType = ReturnType<typeof SetSearchCardEmpty>
 export type SetSearchCardArrType = ReturnType<typeof SetSearchCardArr>
 export type SetPageForSearchCardModeType = ReturnType<typeof SetPageForSearchCardMode>
+export type SetPageCountType = ReturnType<typeof SetPageCount>
+export type SetErrorCardTextType = ReturnType<typeof SetErrorCardText>
 
 export type AllTabletActionType =
     SetCardInfoType
@@ -231,6 +359,8 @@ export type AllTabletActionType =
     | SetSearchCardEmptyType
     | SetSearchCardArrType
     | SetPageForSearchCardModeType
+    | SetPageCountType
+    | SetErrorCardTextType
 
 
 export type OneCardsType = {

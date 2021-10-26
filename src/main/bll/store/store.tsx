@@ -21,9 +21,9 @@ const reducers = combineReducers({
     registration: RegistrationReducer,
     error404: Error404Reducer,
     profile: ProfileReducer,
-    app:AppReducer,
-    tablet:TabletReducer,
-    card:CardReducer
+    app: AppReducer,
+    tablet: TabletReducer,
+    card: CardReducer
 })
 
 

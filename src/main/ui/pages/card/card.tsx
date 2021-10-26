@@ -7,27 +7,30 @@ import {useDispatch, useSelector} from 'react-redux';
 import {AppStoreType} from '../../../bll/store/store';
 import {InitialStateLoginType} from '../../../bll/redusers/profile-reducer';
 import 'rc-slider/assets/index.css';
-import {NavLink, useParams} from 'react-router-dom';
+import {NavLink, Redirect, useParams} from 'react-router-dom';
 import {PATH} from '../../routes/Routes';
 import Paginator from '../tablet-cards/Paginator/Paginator';
 import {
+    AddCard, DeleteCard,
     getCard,
     InitialStateCardType,
-    OneCardsType, searchCard, SearchCardTextType,
-    SetGradeValue, SetSearchCardText, SetSearchedCardBy, SetSortCardStatus,
-    sortCardsStatusType
+    OneCardsType,
+    searchCard,
+    SearchCardTextType,
+    SetGradeValue, SetPageCount,
+    SetSearchCardArr,
+    SetSearchCardEmpty,
+    SetSearchCardMode,
+    SetSearchCardText,
+    SetSearchedCardBy,
+    SetSortCardStatus,
+    sortCardsStatusType, UpdateCard
 } from '../../../bll/redusers/card-reducer';
 import {Preloader} from '../../common/Preloader/Preloader';
 import {Range} from 'rc-slider';
-import {
-    SearchCorrectCards,
-    SearchTextType,
-    SetMinMaxCardsCurrent,
-    SetSearchedBy, SetSearchText,
-    SetSortStatus,
-    SortPackType
-} from '../../../bll/redusers/tablet-reducer';
 import SuperSelect from '../../common/c5-SuperSelect/SuperSelect';
+import Login from '../login/login';
+import {ResponsePage} from '../../common/ResponsePage/ResponsePage';
 
 
 export const Card = () => {
@@ -41,18 +44,28 @@ export const Card = () => {
     const selectParamsCardOptions: SearchCardTextType[] = ['By answer', 'By question']
     const [selectedCardParams, setSelectedCardParams] = useState<SearchCardTextType>(selectParamsCardOptions[0]);
     const [search, setSearch] = useState<string>('');
+    const isLogin = useSelector<AppStoreType, boolean>(state => state.login.logIn);
 
-
-    const {loadingStatusCard, packUserId, cardsTotalCount, pageCount, page, gradeValue,sortCards,searchCardMode,pageForSearchCardMode,searchCardArr} = tabletInfo
-
-
+    const {
+        loadingStatusCard,
+        packUserId,
+        cardsTotalCount,
+        page,
+        gradeValue,
+        sortCards,
+        searchCardMode,
+        pageForSearchCardMode,
+        searchCardArr,
+        searchCardEmpty,
+        errorCardText
+    } = tabletInfo
 
 
     const onChangeGradeHandler = (newGradeValue: number[]) => {
         setGradeCardValue(newGradeValue)
     }
 
-    const onClickSearchCardHandler = (newGradeValue: number[]|undefined, sortBy?: SearchCardTextType) => {
+    const onClickSearchCardHandler = (newGradeValue: number[] | undefined, sortBy?: SearchCardTextType) => {
         if (newGradeValue) {
             dispatch(SetGradeValue(newGradeValue))
         } else if (sortBy) {
@@ -60,6 +73,12 @@ export const Card = () => {
             dispatch(SetSearchCardText(search))
             dispatch(searchCard(token))
         }
+    }
+    const onClickSearchModeCardHandler = (newGradeValue: number[], sortBy: SearchCardTextType) => {
+        dispatch(SetGradeValue(newGradeValue))
+        dispatch(SetSearchedCardBy(sortBy))
+        dispatch(SetSearchCardText(search))
+        dispatch(searchCard(token))
     }
 
 
@@ -70,6 +89,28 @@ export const Card = () => {
         setSearch(e.currentTarget.value);
     };
 
+    const onAddNewCardHandler = (cardsPack_id: string) => {
+        dispatch(AddCard({cardsPack_id}))
+
+    };
+    const onDeleteCardHandler = (cardId: string, cardsPack_id: string) => {
+        dispatch(DeleteCard(cardId, cardsPack_id))
+
+    };
+    const onUpdateCardHandler = (_id: string, cardsPack_id: string) => {
+        dispatch(UpdateCard({_id, question: 'blablabla'}, cardsPack_id,))
+
+    };
+
+    const onAllCardPagesHandler = () => {
+        dispatch(SetSearchCardEmpty(''))
+        dispatch(SetSearchCardMode(false))
+        dispatch(SetSearchCardArr(null))
+        dispatch(SetSortCardStatus('0updated'))
+        dispatch(SetPageCount(4))
+        dispatch(getCard(token))
+        setSearch('');
+    };
 
     const {
         _id,
@@ -78,12 +119,32 @@ export const Card = () => {
     } = profile.profile
 
     useEffect(() => {
-        dispatch(getCard(token))
-    }, [page, gradeValue,sortCards])
+        {
+            !searchCardMode && dispatch(getCard(token))
+        }
+        {
+            searchCardMode && dispatch(searchCard(token))
+        }
 
+    }, [page, gradeValue, sortCards])
+
+
+    if (!isLogin) {
+        return <Login/>
+    }
 
     if (loadingStatusCard === 'loading') {
         return <Preloader/>
+    }
+
+    if (loadingStatusCard === 'error') {
+        return <ResponsePage typeOfPage={'cardsError'} errorText={errorCardText}/>
+
+    }
+
+
+    if (loadingStatusCard === 'redirect') {
+        return <Redirect to={PATH.PROFILE}/>
     }
 
     return (
@@ -102,7 +163,9 @@ export const Card = () => {
                         </div>
                         <br/>
                         <br/>
-                        <SuperButton>ADD NEW QUESTION</SuperButton>
+                        <SuperButton disabled={!(profile.profile._id === tabletInfo.packUserId)} onClick={() => {
+                            onAddNewCardHandler(token)
+                        }}>ADD NEW CARD</SuperButton>
                     </div>
 
                     <div className={s.polz}>
@@ -123,7 +186,10 @@ export const Card = () => {
                                onChange={onChangeGradeHandler}/>
                         <br/>
                         <br/>
-                        <SuperButton onClick={() => onClickSearchCardHandler(gradeCardValue)}>search</SuperButton>
+                        {!searchCardMode &&
+                        <SuperButton onClick={() => onClickSearchCardHandler(gradeCardValue)}>search</SuperButton>}
+                        {searchCardMode && <SuperButton
+                            onClick={() => onClickSearchModeCardHandler(gradeCardValue, selectedCardParams)}>search</SuperButton>}
                     </div>
                 </div>
                 <div className={s.table}>
@@ -138,9 +204,9 @@ export const Card = () => {
                             <SuperInputText onChange={onHandlerCardSearch} value={search} label="Search by answer"/>}
                             {selectedCardParams === 'By question' &&
                             <SuperInputText onChange={onHandlerCardSearch} value={search} label="Search by question"/>}
-                            <SuperButton
-                                onClick={() => onClickSearchCardHandler(undefined, selectedCardParams)}>search</SuperButton>
-                            {/*{searchMode && <SuperButton onClick={onAllPagesHandler}>go to all</SuperButton>}*/}
+                            <SuperButton disabled={search === ''}
+                                         onClick={() => onClickSearchCardHandler(undefined, selectedCardParams)}>search</SuperButton>
+                            {searchCardMode && <SuperButton onClick={onAllCardPagesHandler}>go to all</SuperButton>}
                         </div>
                         <SuperSelect onChangeOption={setSelectedCardParams} options={selectParamsCardOptions}/>
 
@@ -188,15 +254,24 @@ export const Card = () => {
                                             onClick={() => onSortBtnHandler('0updated')}>\/
                                     </button>
                                 </div></th>
+                            <th>Action</th>
                         </tr>
                         </thead>
                         <tbody>
+                        {searchCardEmpty &&
+                        <div style={{margin: '60px', fontSize: '50px', color: 'red'}}>{searchCardEmpty}</div>}
                         {AllCards && AllCards.map(t =>
                             <tr key={t.cardsPack_id}>
                                 <td>{t.question}</td>
                                 <td>{t.answer}</td>
                                 <td>{t.grade.toFixed(1)}</td>
                                 <td>{new Date(t.updated).toLocaleDateString()}</td>
+                                <td><SuperButton onClick={() => {
+                                    onDeleteCardHandler(t._id, t.cardsPack_id)
+                                }}>DELETE</SuperButton>
+                                    <SuperButton onClick={() => {
+                                        onUpdateCardHandler(t._id, t.cardsPack_id)
+                                    }}>UPDATE</SuperButton></td>
                             </tr>)}
                         {searchCardArr && searchCardArr[pageForSearchCardMode].map(t =>
                             <tr key={t.cardsPack_id}>
@@ -204,13 +279,19 @@ export const Card = () => {
                                 <td>{t.answer}</td>
                                 <td>{t.grade.toFixed(1)}</td>
                                 <td>{new Date(t.updated).toLocaleDateString()}</td>
+                                <td><SuperButton onClick={() => {
+                                    onDeleteCardHandler(t._id, t.cardsPack_id)
+                                }}>DELETE</SuperButton>
+                                    <SuperButton onClick={() => {
+                                        onUpdateCardHandler(t._id, t.cardsPack_id)
+                                    }}>UPDATE</SuperButton></td>
                             </tr>)}
                         </tbody>
                     </table>
                 </div>
             </div>
             <Paginator cardType={true} pageForSearchMode={pageForSearchCardMode} searchMode={searchCardMode}
-                       totalItemsCount={cardsTotalCount} currentPage={page} pageSize={pageCount}/>
+                       totalItemsCount={cardsTotalCount} currentPage={page} pageSize={4}/>
         </>
     )
         ;

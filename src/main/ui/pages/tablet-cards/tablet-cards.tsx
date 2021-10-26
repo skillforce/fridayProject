@@ -33,7 +33,6 @@ import {PATH} from '../../routes/Routes';
 import Login from '../login/login';
 
 
-
 export const TabletCards = () => {
 
     const isLogin = useSelector<AppStoreType, boolean>(state => state.login.logIn);
@@ -162,7 +161,7 @@ export const TabletCards = () => {
                         </div>
                         <br/>
                         <br/>
-                        <SuperButton onClick={onAddNewCardsClickHandler}>ADD NEW CARDS</SuperButton>
+                        <SuperButton onClick={onAddNewCardsClickHandler}>ADD NEW DECK</SuperButton>
                     </div>
 
                     <div className={s.polz}>
@@ -196,8 +195,8 @@ export const TabletCards = () => {
                             <SuperInputText onChange={onHandlerSearch} value={search} label="Search by name"/>}
                             {selectedParams === 'By creator' &&
                             <SuperInputText onChange={onHandlerSearch} value={search} label="Search by creator"/>}
-                            <SuperButton
-                                onClick={() => onClickSearchBtnHandler(undefined, selectedParams)}>search</SuperButton>
+                            <SuperButton disabled={search === ''}
+                                         onClick={() => onClickSearchBtnHandler(undefined, selectedParams)}>search</SuperButton>
                             {searchMode && <SuperButton onClick={onAllPagesHandler}>go to all</SuperButton>}
                         </div>
                         <SuperSelect onChangeOption={setOptionParams} options={selectParamsOptions}/>
@@ -248,7 +247,8 @@ export const TabletCards = () => {
                                 <td>{t.cardsCount}</td>
                                 <td>{t.updated ? new Date(t.updated).toLocaleDateString() : ''}</td>
                                 <td>{t.user_name}</td>
-                                <td style={{display: 'flex'}}><NavLink to={"/card/" + t._id}><SuperButton>Learn</SuperButton></NavLink>
+                                <td style={{display: 'flex'}}><NavLink
+                                    to={'/card/' + t._id}><SuperButton>Learn</SuperButton></NavLink>
                                     {t.user_id === profile.profile._id &&
                                     <SuperButton onClick={() => onDeleteCardsHandler(t._id)}>del</SuperButton>}
                                     {t.user_id === profile.profile._id &&
