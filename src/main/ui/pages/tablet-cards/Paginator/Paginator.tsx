@@ -3,6 +3,7 @@ import s from './Paginator.module.css';
 import {useDispatch, useSelector} from 'react-redux';
 import {AppStoreType} from '../../../../bll/store/store';
 import {SetCurrentPage, SetPageForSearchMode} from '../../../../bll/redusers/tablet-reducer';
+import {SetPage, SetPageForSearchCardMode} from '../../../../bll/redusers/card-reducer';
 
 
 const {page, pageSelect, btnGroup} = s;
@@ -14,19 +15,33 @@ type PaginatorPropsType = {
     currentPage?: number
     searchMode:boolean
     pageForSearchMode:number
+    cardType?:boolean
 }
 
 
 const Paginator = (props:PaginatorPropsType) => {
-    const {totalItemsCount, pageSize, currentPage,searchMode,pageForSearchMode} = props;
+    const {totalItemsCount, pageSize, currentPage,searchMode,pageForSearchMode,cardType} = props;
 
     const dispatch = useDispatch();
     const portionSize=10;
 
 
     const onPageChanged=(p:number)=>{
-        {!searchMode && dispatch(SetCurrentPage(p))}
-        {searchMode&& dispatch(SetPageForSearchMode(p-1))}
+        if(!cardType) {
+            {
+                !searchMode && dispatch(SetCurrentPage(p))
+            }
+            {
+                searchMode && dispatch(SetPageForSearchMode(p - 1))
+            }
+        }else{
+            {
+                !searchMode && dispatch(SetPage(p))
+            }
+            {
+                searchMode && dispatch(SetPageForSearchCardMode(p - 1))
+            }
+        }
     }
 
     let pagesCount = Math.ceil(totalItemsCount / pageSize);

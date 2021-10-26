@@ -6,25 +6,69 @@ import user from '../../../../assets/img/user.png'
 import {useDispatch, useSelector} from 'react-redux';
 import {AppStoreType} from '../../../bll/store/store';
 import {InitialStateLoginType} from '../../../bll/redusers/profile-reducer';
-import {Range} from 'rc-slider';
 import 'rc-slider/assets/index.css';
-import SuperSelect from '../../common/c5-SuperSelect/SuperSelect';
 import {NavLink, useParams} from 'react-router-dom';
 import {PATH} from '../../routes/Routes';
 import Paginator from '../tablet-cards/Paginator/Paginator';
-import {getCard, InitialStateCardType} from '../../../bll/redusers/card-reducer';
-import card from '../../../../../../backFriday/back/src/cnb-2-features/f-2-cards/c-2-models/card';
+import {
+    getCard,
+    InitialStateCardType,
+    OneCardsType, searchCard, SearchCardTextType,
+    SetGradeValue, SetSearchCardText, SetSearchedCardBy, SetSortCardStatus,
+    sortCardsStatusType
+} from '../../../bll/redusers/card-reducer';
+import {Preloader} from '../../common/Preloader/Preloader';
+import {Range} from 'rc-slider';
+import {
+    SearchCorrectCards,
+    SearchTextType,
+    SetMinMaxCardsCurrent,
+    SetSearchedBy, SetSearchText,
+    SetSortStatus,
+    SortPackType
+} from '../../../bll/redusers/tablet-reducer';
+import SuperSelect from '../../common/c5-SuperSelect/SuperSelect';
 
 
 export const Card = () => {
 
     const dispatch = useDispatch();
     const {token} = useParams<{ token: string }>();
-    const AllCards = useSelector<AppStoreType, InitialStateCardType>(state => state.card)
+    const tabletInfo = useSelector<AppStoreType, InitialStateCardType>(state => state.card)
+    const AllCards = useSelector<AppStoreType, OneCardsType[]>(state => state.card.cards)
     const profile = useSelector<AppStoreType, InitialStateLoginType>(state => state.profile)
-    const {
-        cards,
-    } = AllCards
+    const [gradeCardValue, setGradeCardValue] = useState<number[]>([tabletInfo.gradeValue[0], tabletInfo.gradeValue[1]])
+    const selectParamsCardOptions: SearchCardTextType[] = ['By answer', 'By question']
+    const [selectedCardParams, setSelectedCardParams] = useState<SearchCardTextType>(selectParamsCardOptions[0]);
+    const [search, setSearch] = useState<string>('');
+
+
+    const {loadingStatusCard, packUserId, cardsTotalCount, pageCount, page, gradeValue,sortCards,searchCardMode,pageForSearchCardMode,searchCardArr} = tabletInfo
+
+
+
+
+    const onChangeGradeHandler = (newGradeValue: number[]) => {
+        setGradeCardValue(newGradeValue)
+    }
+
+    const onClickSearchCardHandler = (newGradeValue: number[]|undefined, sortBy?: SearchCardTextType) => {
+        if (newGradeValue) {
+            dispatch(SetGradeValue(newGradeValue))
+        } else if (sortBy) {
+            dispatch(SetSearchedCardBy(sortBy))
+            dispatch(SetSearchCardText(search))
+            dispatch(searchCard(token))
+        }
+    }
+
+
+    const onSortBtnHandler = (newStatus: sortCardsStatusType) => {
+        dispatch(SetSortCardStatus(newStatus))
+    }
+    const onHandlerCardSearch = (e: SyntheticEvent<HTMLInputElement>) => {
+        setSearch(e.currentTarget.value);
+    };
 
 
     const {
@@ -35,8 +79,12 @@ export const Card = () => {
 
     useEffect(() => {
         dispatch(getCard(token))
-    }, [])
+    }, [page, gradeValue,sortCards])
 
+
+    if (loadingStatusCard === 'loading') {
+        return <Preloader/>
+    }
 
     return (
         <>
@@ -58,97 +106,114 @@ export const Card = () => {
                     </div>
 
                     <div className={s.polz}>
-                        <div className={s.polztit}>ID of cards:</div>
+                        <div className={s.polztit}>Creator ID:</div>
+                        <br/>
+                        {packUserId}
                         <br/>
                         <br/>
-                        Current of cards
+                        <br/>
+                        Current of cards: {cardsTotalCount}
                         <br/>
                         <br/>
                         <div className={s.rangeValues}>
-                            {/*<div>min:{rangeValue[0]}</div>*/}
-                            {/*<div>max:{rangeValue[1]}</div>*/}
+                            <div>min:{gradeCardValue[0]}</div>
+                            <div>max:{gradeCardValue[1]}</div>
                         </div>
-                        {/*<Range min={0} max={200} defaultValue={rangeValue} value={rangeValue}*/}
-                        {/*       onChange={onChangeRangeHandler}/>*/}
-                        {/*<br/>*/}
-                        {/*<br/>*/}
-                        {/*<SuperButton onClick={() => onClickSearchBtnHandler(rangeValue)}>search</SuperButton>*/}
+                        <Range step={0.1} min={0} max={5} defaultValue={gradeCardValue} value={gradeCardValue}
+                               onChange={onChangeGradeHandler}/>
+                        <br/>
+                        <br/>
+                        <SuperButton onClick={() => onClickSearchCardHandler(gradeCardValue)}>search</SuperButton>
                     </div>
                 </div>
                 <div className={s.table}>
                     <div className={s.tit}>
                         Card list for {name}
                     </div>
-                    {/*<div className={s.inp}>*/}
-                    {/*    <div style={{display: 'flex'}}>*/}
-                    {/*        {selectedParams === 'By name' &&*/}
-                    {/*        <SuperInputText onChange={onHandlerSearch} value={search} label="Search by name"/>}*/}
-                    {/*        {selectedParams === 'By creator' &&*/}
-                    {/*        <SuperInputText onChange={onHandlerSearch} value={search} label="Search by creator"/>}*/}
-                    {/*        <SuperButton*/}
-                    {/*            onClick={() => onClickSearchBtnHandler(undefined, selectedParams)}>search</SuperButton>*/}
-                    {/*        {searchMode && <SuperButton onClick={onAllPagesHandler}>go to all</SuperButton>}*/}
-                    {/*    </div>*/}
-                    {/*    <SuperSelect onChangeOption={setOptionParams} options={selectParamsOptions}/>*/}
+                    <br/>
+                    <br/>
+                    <div className={s.inp}>
+                        <div style={{display: 'flex'}}>
+                            {selectedCardParams === 'By answer' &&
+                            <SuperInputText onChange={onHandlerCardSearch} value={search} label="Search by answer"/>}
+                            {selectedCardParams === 'By question' &&
+                            <SuperInputText onChange={onHandlerCardSearch} value={search} label="Search by question"/>}
+                            <SuperButton
+                                onClick={() => onClickSearchCardHandler(undefined, selectedCardParams)}>search</SuperButton>
+                            {/*{searchMode && <SuperButton onClick={onAllPagesHandler}>go to all</SuperButton>}*/}
+                        </div>
+                        <SuperSelect onChangeOption={setSelectedCardParams} options={selectParamsCardOptions}/>
 
-                    {/*</div>*/}
+                    </div>
                     <table className={s.mainTab}>
                         <thead>
                         <tr>
                             <th>Question
-                                {/*<div>*/}
-                                {/*    <button className={tablet.sortStatus === '1name' ? s.activeBtn : ''}*/}
-                                {/*            onClick={() => onSortBtnHandler('1name')}>/\*/}
-                                {/*    </button>*/}
-                                {/*    <button className={tablet.sortStatus === '0name' ? s.activeBtn : ''}*/}
-                                {/*            onClick={() => onSortBtnHandler('0name')}>\/*/}
-                                {/*    </button>*/}
-                                {/*</div>*/}
+                                <div>
+                                    <button className={tabletInfo.sortCards === '1question' ? s.activeBtn : ''}
+                                            onClick={() => onSortBtnHandler('1question')}>/\
+                                    </button>
+                                    <button className={tabletInfo.sortCards === '0question' ? s.activeBtn : ''}
+                                            onClick={() => onSortBtnHandler('0question')}>\/
+                                    </button>
+                                </div>
                             </th>
 
                             <th>Answer
-                                {/*<div>*/}
-                                {/*    <button className={tablet.sortStatus === '1cardsCount' ? s.activeBtn : ''}*/}
-                                {/*            onClick={() => onSortBtnHandler('1cardsCount')}>/\*/}
-                                {/*    </button>*/}
-                                {/*    <button className={tablet.sortStatus === '0cardsCount' ? s.activeBtn : ''}*/}
-                                {/*            onClick={() => onSortBtnHandler('0cardsCount')}>\/*/}
-                                {/*    </button>*/}
-                                {/*</div>*/}
+                                <div>
+                                    <button className={tabletInfo.sortCards === '1answer' ? s.activeBtn : ''}
+                                            onClick={() => onSortBtnHandler('1answer')}>/\
+                                    </button>
+                                    <button className={tabletInfo.sortCards === '0answer' ? s.activeBtn : ''}
+                                            onClick={() => onSortBtnHandler('0answer')}>\/
+                                    </button>
+                                </div>
                             </th>
                             <th>Grade
-                                {/*<div>*/}
-                                {/*    <button className={tablet.sortStatus === '1updated' ? s.activeBtn : ''}*/}
-                                {/*            onClick={() => onSortBtnHandler('1updated')}>/\*/}
-                                {/*    </button>*/}
-                                {/*    <button className={tablet.sortStatus === '0updated' ? s.activeBtn : ''}*/}
-                                {/*            onClick={() => onSortBtnHandler('0updated')}>\/*/}
-                                {/*    </button>*/}
-                                {/*</div>*/}
+                                <div>
+                                    <button className={tabletInfo.sortCards === '1grade' ? s.activeBtn : ''}
+                                            onClick={() => onSortBtnHandler('1grade')}>/\
+                                    </button>
+                                    <button className={tabletInfo.sortCards === '0grade' ? s.activeBtn : ''}
+                                            onClick={() => onSortBtnHandler('0grade')}>\/
+                                    </button>
+                                </div>
                             </th>
-                            <th>Updated</th>
-                            <th>Type</th>
+                            <th>Updated
+                                <div>
+                                    <button className={tabletInfo.sortCards === '1updated' ? s.activeBtn : ''}
+                                            onClick={() => onSortBtnHandler('1updated')}>/\
+                                    </button>
+                                    <button className={tabletInfo.sortCards === '0updated' ? s.activeBtn : ''}
+                                            onClick={() => onSortBtnHandler('0updated')}>\/
+                                    </button>
+                                </div></th>
                         </tr>
                         </thead>
                         <tbody>
-                        {/*{searchEmpty &&*/}
-                        {/*<div style={{margin: '60px', fontSize: '50px', color: 'red'}}>{searchEmpty}</div>}*/}
-                        {cards && cards.map(t =>
+                        {AllCards && AllCards.map(t =>
                             <tr key={t.cardsPack_id}>
                                 <td>{t.question}</td>
                                 <td>{t.answer}</td>
-                                <td>{t.grade}</td>
+                                <td>{t.grade.toFixed(1)}</td>
                                 <td>{new Date(t.updated).toLocaleDateString()}</td>
-                                <td>{t.type}</td>
+                            </tr>)}
+                        {searchCardArr && searchCardArr[pageForSearchCardMode].map(t =>
+                            <tr key={t.cardsPack_id}>
+                                <td>{t.question}</td>
+                                <td>{t.answer}</td>
+                                <td>{t.grade.toFixed(1)}</td>
+                                <td>{new Date(t.updated).toLocaleDateString()}</td>
                             </tr>)}
                         </tbody>
                     </table>
                 </div>
             </div>
-            {/*<Paginator pageForSearchMode={pageForSearchMode} searchMode={searchMode}*/}
-            {/*           totalItemsCount={cardPacksTotalCount} currentPage={currentPage} pageSize={pageCount}/>*/}
+            <Paginator cardType={true} pageForSearchMode={pageForSearchCardMode} searchMode={searchCardMode}
+                       totalItemsCount={cardsTotalCount} currentPage={page} pageSize={pageCount}/>
         </>
-    );
+    )
+        ;
 }
 
 export default Card;
