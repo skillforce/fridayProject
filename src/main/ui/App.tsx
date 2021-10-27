@@ -8,9 +8,6 @@ import {AuthMe, IsInitializedStatusType} from '../bll/redusers/app-reducer';
 import {Preloader} from './common/Preloader/Preloader';
 
 // +_+
-
-
-// +_+
 const App = () => {
     const isInitialized = useSelector<AppStoreType, IsInitializedStatusType>(state => state.app.isInitialized)
     const dispatch = useDispatch();
