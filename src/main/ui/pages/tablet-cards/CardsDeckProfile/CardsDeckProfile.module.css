@@ -1,0 +1,54 @@
+.user {
+    width: 250px;
+    background: #ECECF9;
+}
+
+
+.user_card {
+    height: 250px;
+    background: #D9D9F1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0 0 10px 10px;
+    flex-direction: column;
+}
+
+.logo img {
+    height: 96px;
+    width: 96px;
+    border-radius: 50%;
+}
+
+.name_profile {
+    color: #2D2E46;
+    font-size: 23px;
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+.about {
+    font-size: 14px;
+    color: #83839b;
+    margin: 10px 0 15px 0;
+
+}
+
+.polz {
+    margin: 15px 20px;
+    text-align: left;
+}
+
+.polztit {
+margin-bottom: 35px;
+}
+
+.rangeValues{
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    margin-bottom: 20px;
+}
+.rangeClass{
+    margin-bottom: 25px;
+}

@@ -2,12 +2,11 @@ import React, {SyntheticEvent, useEffect, useState} from 'react';
 import SuperInputText from '../../common/c1-SuperInputText/SuperInputText';
 import SuperButton from '../../common/c2-SuperButton/SuperButton';
 import s from './card.module.css';
-import user from '../../../../assets/img/user.png'
 import {useDispatch, useSelector} from 'react-redux';
 import {AppStoreType} from '../../../bll/store/store';
 import {InitialStateLoginType} from '../../../bll/redusers/profile-reducer';
 import 'rc-slider/assets/index.css';
-import {NavLink, Redirect, useParams} from 'react-router-dom';
+import {Redirect, useParams} from 'react-router-dom';
 import {PATH} from '../../routes/Routes';
 import Paginator from '../tablet-cards/Paginator/Paginator';
 import {
@@ -27,10 +26,13 @@ import {
     sortCardsStatusType, UpdateCard
 } from '../../../bll/redusers/card-reducer';
 import {Preloader} from '../../common/Preloader/Preloader';
-import {Range} from 'rc-slider';
 import SuperSelect from '../../common/c5-SuperSelect/SuperSelect';
 import Login from '../login/login';
 import {ResponsePage} from '../../common/ResponsePage/ResponsePage';
+import {SortBtn} from '../tablet-cards/sortBtn/sortBtn';
+import {InitialStateTabletType} from '../../../bll/redusers/tablet-reducer';
+import {CardOnlyCard} from './CardOnlyCard/CardOnlyCard';
+import {CardProfile} from './CardProfile/CardProfile';
 
 
 export const Card = () => {
@@ -40,6 +42,7 @@ export const Card = () => {
     const tabletInfo = useSelector<AppStoreType, InitialStateCardType>(state => state.card)
     const AllCards = useSelector<AppStoreType, OneCardsType[]>(state => state.card.cards)
     const profile = useSelector<AppStoreType, InitialStateLoginType>(state => state.profile)
+    const tablet = useSelector<AppStoreType, InitialStateTabletType>(state => state.tablet)
     const [gradeCardValue, setGradeCardValue] = useState<number[]>([tabletInfo.gradeValue[0], tabletInfo.gradeValue[1]])
     const selectParamsCardOptions: SearchCardTextType[] = ['By answer', 'By question']
     const [selectedCardParams, setSelectedCardParams] = useState<SearchCardTextType>(selectParamsCardOptions[0]);
@@ -48,7 +51,6 @@ export const Card = () => {
 
     const {
         loadingStatusCard,
-        packUserId,
         cardsTotalCount,
         page,
         gradeValue,
@@ -150,48 +152,13 @@ export const Card = () => {
     return (
         <>
             <div className={s.profile}>
-                <div className={s.user}>
-                    <div className={s.user_card}>
-                        <div className={s.logo}>
-                            <NavLink to={PATH.PROFILE}><img src={avatar ? avatar : user} alt=""/></NavLink>
-                        </div>
-                        <div className={s.name}>
-                            {name}
-                        </div>
-                        <div className={s.about}>
-                            {_id}
-                        </div>
-                        <br/>
-                        <br/>
-                        <SuperButton disabled={!(profile.profile._id === tabletInfo.packUserId)} onClick={() => {
-                            onAddNewCardHandler(token)
-                        }}>ADD NEW CARD</SuperButton>
-                    </div>
-
-                    <div className={s.polz}>
-                        <div className={s.polztit}>Creator ID:</div>
-                        <br/>
-                        {packUserId}
-                        <br/>
-                        <br/>
-                        <br/>
-                        Current of cards: {cardsTotalCount}
-                        <br/>
-                        <br/>
-                        <div className={s.rangeValues}>
-                            <div>min:{gradeCardValue[0]}</div>
-                            <div>max:{gradeCardValue[1]}</div>
-                        </div>
-                        <Range step={0.1} min={0} max={5} defaultValue={gradeCardValue} value={gradeCardValue}
-                               onChange={onChangeGradeHandler}/>
-                        <br/>
-                        <br/>
-                        {!searchCardMode &&
-                        <SuperButton onClick={() => onClickSearchCardHandler(gradeCardValue)}>search</SuperButton>}
-                        {searchCardMode && <SuperButton
-                            onClick={() => onClickSearchModeCardHandler(gradeCardValue, selectedCardParams)}>search</SuperButton>}
-                    </div>
-                </div>
+                <CardProfile avatar={avatar} name={name} _id={_id}
+                             onAddNewCardHandler={onAddNewCardHandler} gradeCardValue={gradeCardValue}
+                             onClickSearchModeCardHandler={onClickSearchModeCardHandler}
+                             onChangeGradeHandler={onChangeGradeHandler} cardsTotalCount={cardsTotalCount}
+                             packUserId={tabletInfo.packUserId} token={token}
+                             searchCardMode={searchCardMode} selectedCardParams={selectedCardParams}
+                             onClickSearchCardHandler={onClickSearchCardHandler}/>
                 <div className={s.table}>
                     <div className={s.tit}>
                         Card list for {name}
@@ -215,78 +182,29 @@ export const Card = () => {
                         <thead>
                         <tr>
                             <th>Question
-                                <div>
-                                    <button className={tabletInfo.sortCards === '1question' ? s.activeBtn : ''}
-                                            onClick={() => onSortBtnHandler('1question')}>/\
-                                    </button>
-                                    <button className={tabletInfo.sortCards === '0question' ? s.activeBtn : ''}
-                                            onClick={() => onSortBtnHandler('0question')}>\/
-                                    </button>
-                                </div>
+                                <SortBtn property={'question'} sortStatus={tabletInfo.sortCards}
+                                         onSortBtnHandler={onSortBtnHandler}/>
                             </th>
 
                             <th>Answer
-                                <div>
-                                    <button className={tabletInfo.sortCards === '1answer' ? s.activeBtn : ''}
-                                            onClick={() => onSortBtnHandler('1answer')}>/\
-                                    </button>
-                                    <button className={tabletInfo.sortCards === '0answer' ? s.activeBtn : ''}
-                                            onClick={() => onSortBtnHandler('0answer')}>\/
-                                    </button>
-                                </div>
+                                <SortBtn property={'answer'} sortStatus={tabletInfo.sortCards}
+                                         onSortBtnHandler={onSortBtnHandler}/>
                             </th>
                             <th>Grade
-                                <div>
-                                    <button className={tabletInfo.sortCards === '1grade' ? s.activeBtn : ''}
-                                            onClick={() => onSortBtnHandler('1grade')}>/\
-                                    </button>
-                                    <button className={tabletInfo.sortCards === '0grade' ? s.activeBtn : ''}
-                                            onClick={() => onSortBtnHandler('0grade')}>\/
-                                    </button>
-                                </div>
+                                <SortBtn property={'grade'} sortStatus={tabletInfo.sortCards}
+                                         onSortBtnHandler={onSortBtnHandler}/>
                             </th>
                             <th>Updated
-                                <div>
-                                    <button className={tabletInfo.sortCards === '1updated' ? s.activeBtn : ''}
-                                            onClick={() => onSortBtnHandler('1updated')}>/\
-                                    </button>
-                                    <button className={tabletInfo.sortCards === '0updated' ? s.activeBtn : ''}
-                                            onClick={() => onSortBtnHandler('0updated')}>\/
-                                    </button>
-                                </div></th>
+                                <SortBtn property={'updated'} sortStatus={tabletInfo.sortCards}
+                                         onSortBtnHandler={onSortBtnHandler}/></th>
                             <th>Action</th>
                         </tr>
                         </thead>
-                        <tbody>
-                        {searchCardEmpty &&
-                        <div style={{margin: '60px', fontSize: '50px', color: 'red'}}>{searchCardEmpty}</div>}
-                        {AllCards && AllCards.map(t =>
-                            <tr key={t.cardsPack_id}>
-                                <td>{t.question}</td>
-                                <td>{t.answer}</td>
-                                <td>{t.grade.toFixed(1)}</td>
-                                <td>{new Date(t.updated).toLocaleDateString()}</td>
-                                <td><SuperButton onClick={() => {
-                                    onDeleteCardHandler(t._id, t.cardsPack_id)
-                                }}>DELETE</SuperButton>
-                                    <SuperButton onClick={() => {
-                                        onUpdateCardHandler(t._id, t.cardsPack_id)
-                                    }}>UPDATE</SuperButton></td>
-                            </tr>)}
-                        {searchCardArr && searchCardArr[pageForSearchCardMode].map(t =>
-                            <tr key={t.cardsPack_id}>
-                                <td>{t.question}</td>
-                                <td>{t.answer}</td>
-                                <td>{t.grade.toFixed(1)}</td>
-                                <td>{new Date(t.updated).toLocaleDateString()}</td>
-                                <td><SuperButton onClick={() => {
-                                    onDeleteCardHandler(t._id, t.cardsPack_id)
-                                }}>DELETE</SuperButton>
-                                    <SuperButton onClick={() => {
-                                        onUpdateCardHandler(t._id, t.cardsPack_id)
-                                    }}>UPDATE</SuperButton></td>
-                            </tr>)}
-                        </tbody>
+                        <CardOnlyCard searchCardEmpty={searchCardEmpty} AllCards={AllCards}
+                                      searchCardArr={searchCardArr}
+                                      pageForSearchCardMode={pageForSearchCardMode} profileId={profile.profile._id}
+                                      onDeleteCardHandler={onDeleteCardHandler}
+                                      onUpdateCardHandler={onUpdateCardHandler}/>
                     </table>
                 </div>
             </div>

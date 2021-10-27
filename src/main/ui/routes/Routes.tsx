@@ -16,9 +16,10 @@ export const PATH = {
     PROFILE: '/profile',
     RECOVER_PASS: '/recPassword',
     REGISTRATION: '/reg',
-    TEST: '/card/:token',
+    TEST: '/test',
     CREATE_NEW_PASS:'/set-new-password/:token',
-    CARDS_TABLET:'/cards-tablet'
+    CARDS_TABLET:'/cards-tablet',
+    CARD:'/card/:token'
 }
 
 
@@ -32,9 +33,10 @@ export const Routes = () => {
                 <Route path={PATH.PROFILE} render={() => <Profile/>}/>
                 <Route path={PATH.RECOVER_PASS} render={() => <RecoverPass/>}/>
                 <Route path={PATH.REGISTRATION} render={() => <Registration/>}/>
-                <Route path={PATH.TEST} render={() => <Card/>}/>
+                <Route path={PATH.TEST} render={() => <Redirect to={PATH.LOGIN}/>}/>
                 <Route path={PATH.CREATE_NEW_PASS} render={() => <SetNewPassword/>}/>
                 <Route path={PATH.CARDS_TABLET} render={() => <TabletCards/>}/>
+                <Route path={PATH.CARD} render={() => <Card/>}/>
 
                 <Route render={() => <Error404/>}/>
 

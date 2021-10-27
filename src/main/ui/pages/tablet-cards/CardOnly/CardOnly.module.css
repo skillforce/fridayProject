@@ -1,0 +1,9 @@
+.tableTitle{
+    margin: 60px;
+    font-size: 50px;
+    color: red
+}
+
+.btnBlock{
+    display: flex;
+}
