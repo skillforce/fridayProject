@@ -8,7 +8,7 @@ import {InitialStateLoginType} from '../../../bll/redusers/profile-reducer';
 import 'rc-slider/assets/index.css';
 import {Redirect, useParams} from 'react-router-dom';
 import {PATH} from '../../routes/Routes';
-import Paginator from '../tablet-cards/Paginator/Paginator';
+import Paginator from '../../common/Paginator/Paginator';
 import {
     AddCard, DeleteCard,
     getCard,
@@ -29,10 +29,12 @@ import {Preloader} from '../../common/Preloader/Preloader';
 import SuperSelect from '../../common/c5-SuperSelect/SuperSelect';
 import Login from '../login/login';
 import {ResponsePage} from '../../common/ResponsePage/ResponsePage';
-import {SortBtn} from '../tablet-cards/sortBtn/sortBtn';
+import {SortBtn} from '../../common/sortBtn/sortBtn';
 import {InitialStateTabletType} from '../../../bll/redusers/tablet-reducer';
 import {CardOnlyCard} from './CardOnlyCard/CardOnlyCard';
 import {CardProfile} from './CardProfile/CardProfile';
+import {NavLink} from 'react-router-dom';
+import {SearchBlock} from '../../common/SearchBlock/SearchBlock';
 
 
 export const Card = () => {
@@ -96,6 +98,7 @@ export const Card = () => {
 
     };
     const onDeleteCardHandler = (cardId: string, cardsPack_id: string) => {
+
         dispatch(DeleteCard(cardId, cardsPack_id))
 
     };
@@ -141,9 +144,7 @@ export const Card = () => {
 
     if (loadingStatusCard === 'error') {
         return <ResponsePage typeOfPage={'cardsError'} errorText={errorCardText}/>
-
     }
-
 
     if (loadingStatusCard === 'redirect') {
         return <Redirect to={PATH.PROFILE}/>
@@ -165,19 +166,9 @@ export const Card = () => {
                     </div>
                     <br/>
                     <br/>
-                    <div className={s.inp}>
-                        <div style={{display: 'flex'}}>
-                            {selectedCardParams === 'By answer' &&
-                            <SuperInputText onChange={onHandlerCardSearch} value={search} label="Search by answer"/>}
-                            {selectedCardParams === 'By question' &&
-                            <SuperInputText onChange={onHandlerCardSearch} value={search} label="Search by question"/>}
-                            <SuperButton disabled={search === ''}
-                                         onClick={() => onClickSearchCardHandler(undefined, selectedCardParams)}>search</SuperButton>
-                            {searchCardMode && <SuperButton onClick={onAllCardPagesHandler}>go to all</SuperButton>}
-                        </div>
-                        <SuperSelect onChangeOption={setSelectedCardParams} options={selectParamsCardOptions}/>
-
-                    </div>
+                    <SearchBlock selectedParams={selectedCardParams} onHandlerSearch={onHandlerCardSearch} onClickSearchBtnHandler={onClickSearchCardHandler}
+                                 search={search} searchMode={searchCardMode} onAllPagesHandler={onAllCardPagesHandler} selectParamsOptions={selectParamsCardOptions} setOptionParams={setSelectedCardParams} searchProperty={selectParamsCardOptions}/>
+                    <NavLink to={PATH.CARDS_TABLET}><SuperButton onClick={onAllCardPagesHandler}>go to all decks </SuperButton></NavLink>
                     <table className={s.mainTab}>
                         <thead>
                         <tr>

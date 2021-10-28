@@ -63,7 +63,7 @@ const Profile = () => {
                     <div>ID:{_id}</div>
                 </div>
                 <button onClick={()=>{onClickHandler(true)}}>Edit profile</button>
-                <SuperButton><NavLink to={PATH.CARDS_TABLET} style={{color:'white',textDecoration:'none'}}>going to cards tablet</NavLink></SuperButton>
+                <SuperButton><NavLink to={PATH.CARDS_TABLET} style={{color:'white',textDecoration:'none'}}>Go to cards tablet</NavLink></SuperButton>
             </div>}
              {isEditMode && <EditProfile onClickHandler={onClickHandler} isEditMode={isEditMode} />}
 

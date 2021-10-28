@@ -1,6 +1,7 @@
 import {Dispatch} from 'redux';
 import {CardsPackAPI, CardsPackType} from '../../dal/Api';
 import {AppStoreType} from '../store/store';
+import {SetCardInfo, SetSearchCardEmpty} from './card-reducer';
 
 
 const SET_TABLET_INFO = 'TabletReducer/SET_TABLET_INFO';
@@ -149,9 +150,15 @@ export const getCarsPack = () => {
         dispatch(SetLoadingStatus('loading'));
         const promise = CardsPackAPI.getCards({page, pageCount, min, max, sortPacks, user_id})
             .then(res => {
+                if (res.data.cardPacks.length !== 0) {
+                    dispatch(SetSearchEmpty(''))
                     dispatch(SetTabletInfo(res.data))
+                } else {
+                    dispatch(SetTabletInfo({...res.data, cardPacksTotalCount: 1, cardPacks: []}))
+                    dispatch(SetSearchEmpty('not found any cards'))
                 }
-            )
+            })
+
             .catch(error => {
                 dispatch(SetErrorText(error.toString()))
                 dispatch(SetLoadingStatus('error'));
@@ -195,14 +202,11 @@ export const SearchCorrectCards = () => {
                             dispatch(SetSearchMode(true))
                             dispatch(SetSearchCardsArr(temp))
                             dispatch(SetTabletInfo({...res.data, cardPacksTotalCount: newTotalCount, cardPacks: []}))
-                            dispatch(SetLoadingStatus('success'));
                         } else {
                             dispatch(SetSearchMode(true))
                             dispatch(SetSearchCardsArr(null))
-                            debugger
                             dispatch(SetTabletInfo({...res.data, cardPacksTotalCount: 1, cardPacks: []}))
                             dispatch(SetSearchEmpty('not found by this name'))
-                            dispatch(SetLoadingStatus('success'));
                         }
                     }
                     if (searchBy === 'By creator') {
@@ -217,13 +221,11 @@ export const SearchCorrectCards = () => {
                             dispatch(SetSearchMode(true))
                             dispatch(SetSearchCardsArr(temp))
                             dispatch(SetTabletInfo({...res.data, cardPacksTotalCount: newTotalCount, cardPacks: []}))
-                            dispatch(SetLoadingStatus('success'));
                         } else {
                             dispatch(SetSearchMode(true))
                             dispatch(SetSearchCardsArr(null))
                             dispatch(SetTabletInfo({...res.data, cardPacksTotalCount: 1, cardPacks: []}))
                             dispatch(SetSearchEmpty('not found by this creator'))
-                            dispatch(SetLoadingStatus('success'));
                         }
                     }
 
@@ -251,25 +253,13 @@ export const PostCards = (params: CardsPackType = {name: 'aaaaa'}) => {
         const searchMode = getState().tablet.searchMode
         dispatch(SetLoadingStatus('loading'));
         const promise = CardsPackAPI.addNewCards(params)
-            .then(res => {
-                {
-                    !searchMode && dispatch(getCarsPack())
-                }
-                {
-                    searchMode && dispatch(SearchCorrectCards())
-                }
-            })
+            .then(res => searchMode ? dispatch(SearchCorrectCards()) : dispatch(getCarsPack()))
             .catch(error => {
                 dispatch(SetErrorText(error.toString()))
                 dispatch(SetLoadingStatus('error'));
                 setTimeout(() => {
                     dispatch(SetLoadingStatus('redirect'))
                 }, 3000)
-            })
-            .finally(() => {
-                setTimeout(() => {
-                    dispatch(SetLoadingStatus('success'))
-                }, 5000)
             })
     }
 }
@@ -277,15 +267,8 @@ export const DeleteCards = (cardId: string) => {
     return (dispatch: Dispatch<any>, getState: () => AppStoreType) => {
         dispatch(SetLoadingStatus('loading'));
         const searchMode = getState().tablet.searchMode
-        const promise = CardsPackAPI.deleteCards(cardId)
-            .then(res => {
-                {
-                    !searchMode && dispatch(getCarsPack())
-                }
-                {
-                    searchMode && dispatch(SearchCorrectCards())
-                }
-            })
+        CardsPackAPI.deleteCards(cardId)
+            .then(res => searchMode ? dispatch(SearchCorrectCards()) : dispatch(getCarsPack()))
             .catch(error => {
                 dispatch(SetErrorText(error.toString()))
                 dispatch(SetLoadingStatus('error'));
@@ -293,38 +276,21 @@ export const DeleteCards = (cardId: string) => {
                     dispatch(SetLoadingStatus('redirect'))
                 }, 3000)
 
-            })
-            .finally(() => {
-                setTimeout(() => {
-                    dispatch(SetLoadingStatus('success'))
-                }, 5000)
             })
     }
 }
 export const updateCards = (cardId: string) => {
     return (dispatch: Dispatch<any>, getState: () => AppStoreType) => {
         const searchMode = getState().tablet.searchMode
+        dispatch(SetLoadingStatus('loading'));
         CardsPackAPI.updateCards(cardId)
-            .then(res => {
-                {
-                    !searchMode && dispatch(getCarsPack())
-                }
-                {
-                    searchMode && dispatch(SearchCorrectCards())
-                }
-            })
+            .then(res => searchMode ? dispatch(SearchCorrectCards()) : dispatch(getCarsPack()))
             .catch(error => {
                 dispatch(SetErrorText(error.toString()))
                 dispatch(SetLoadingStatus('error'));
                 setTimeout(() => {
                     dispatch(SetLoadingStatus('redirect'))
                 }, 3000)
-
-            })
-            .finally(() => {
-                setTimeout(() => {
-                    dispatch(SetLoadingStatus('success'))
-                }, 5000)
             })
     }
 }
@@ -376,6 +342,7 @@ export type cardType = {
     updated: Date
     __v: number
     user_name: string
+    private: boolean
 }
 export type SortPackType = '0cardsCount' | '1cardsCount' | '0name' | '1name' | '0updated' | '1updated'
 export type SearchTextType = 'By name' | 'By creator' | ''

@@ -19,17 +19,17 @@ import {
 } from '../../../bll/redusers/tablet-reducer';
 import {AppStoreType} from '../../../bll/store/store';
 import {InitialStateLoginType} from '../../../bll/redusers/profile-reducer';
-import Paginator from './Paginator/Paginator';
+import Paginator from '../../common/Paginator/Paginator';
 import 'rc-slider/assets/index.css';
 import {Preloader} from '../../common/Preloader/Preloader';
 import {ResponsePage} from '../../common/ResponsePage/ResponsePage';
 import {NavLink, Redirect} from 'react-router-dom';
 import {PATH} from '../../routes/Routes';
 import Login from '../login/login';
-import {SortBtn} from './sortBtn/sortBtn';
+import {SortBtn} from '../../common/sortBtn/sortBtn';
 import {CardOnly} from './CardOnly/CardOnly';
-import {RangeBlock} from './RangeBlock/RangeBlock';
 import {CardsDeckProfile} from './CardsDeckProfile/CardsDeckProfile';
+import {SearchBlock} from '../../common/SearchBlock/SearchBlock';
 
 
 export const TabletCards = () => {
@@ -158,10 +158,10 @@ export const TabletCards = () => {
                     <div style={{display: 'inline-block'}}>
                         <input onChange={onChangeCheckBoxStatus} checked={checkBoxValue} type={'checkbox'}/>My cards
                     </div>
-                    <RangeBlock selectedParams={selectedParams} onHandlerSearch={onHandlerSearch}
-                                onClickSearchBtnHandler={onClickSearchBtnHandler} search={search}
-                                searchMode={searchMode} onAllPagesHandler={onAllPagesHandler}
-                                selectParamsOptions={selectParamsOptions} setOptionParams={setOptionParams}/>
+                    <SearchBlock searchProperty={selectParamsOptions} selectedParams={selectedParams} onHandlerSearch={onHandlerSearch}
+                                 onClickSearchBtnHandler={onClickSearchBtnHandler} search={search}
+                                 searchMode={searchMode} onAllPagesHandler={onAllPagesHandler}
+                                 selectParamsOptions={selectParamsOptions} setOptionParams={setOptionParams}/>
                     <table className={s.mainTab}>
                         <thead>
                         <tr>

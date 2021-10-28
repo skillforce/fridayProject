@@ -1,8 +1,8 @@
 import React, {useState} from 'react';
 import s from './Paginator.module.css';
 import {useDispatch} from 'react-redux';
-import {SetCurrentPage, SetPageForSearchMode} from '../../../../bll/redusers/tablet-reducer';
-import {SetPage, SetPageForSearchCardMode} from '../../../../bll/redusers/card-reducer';
+import {SetCurrentPage, SetPageForSearchMode} from '../../../bll/redusers/tablet-reducer';
+import {SetPage, SetPageForSearchCardMode} from '../../../bll/redusers/card-reducer';
 
 
 const {page, pageSelect, btnGroup} = s;

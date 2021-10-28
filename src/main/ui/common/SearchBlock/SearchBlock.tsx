@@ -1,25 +1,25 @@
-import s from '../tablet-cards.module.css';
-import SuperInputText from '../../../common/c1-SuperInputText/SuperInputText';
-import SuperButton from '../../../common/c2-SuperButton/SuperButton';
-import SuperSelect from '../../../common/c5-SuperSelect/SuperSelect';
+import s from '../../pages/tablet-cards/tablet-cards.module.css';
+import SuperInputText from '../c1-SuperInputText/SuperInputText';
+import SuperButton from '../c2-SuperButton/SuperButton';
+import SuperSelect from '../c5-SuperSelect/SuperSelect';
 import React, {SyntheticEvent} from 'react';
-import {SearchTextType} from '../../../../bll/redusers/tablet-reducer';
 
 
 type RangeBlockType = {
-    selectedParams: SearchTextType
+    selectedParams: any
     onHandlerSearch: (e: SyntheticEvent<HTMLInputElement>) => void
-    onClickSearchBtnHandler: (newMinMaxCurrent?: number[], sortBy?: SearchTextType) => void
+    onClickSearchBtnHandler: any
     search: string
     searchMode: boolean
     onAllPagesHandler: () => void
-    selectParamsOptions: SearchTextType[]
-    setOptionParams: (newOption: SearchTextType) => void
+    selectParamsOptions: any
+    setOptionParams: any
+    searchProperty:string[]
 
 }
 
 
-export const RangeBlock = (props: RangeBlockType) => {
+export const SearchBlock = (props: RangeBlockType) => {
 
     const {
         selectedParams,
@@ -29,14 +29,15 @@ export const RangeBlock = (props: RangeBlockType) => {
         searchMode,
         onAllPagesHandler,
         selectParamsOptions,
-        setOptionParams
+        setOptionParams,
+        searchProperty
     } = props;
     return (
         <div className={s.inp}>
             <div style={{display: 'flex'}}>
-                {selectedParams === 'By name' &&
+                {selectedParams === searchProperty[0] &&
                 <SuperInputText onChange={onHandlerSearch} value={search} label="Search by name"/>}
-                {selectedParams === 'By creator' &&
+                {selectedParams === searchProperty[1] &&
                 <SuperInputText onChange={onHandlerSearch} value={search} label="Search by creator"/>}
                 <SuperButton disabled={search === ''}
                              onClick={() => onClickSearchBtnHandler(undefined, selectedParams)}>search</SuperButton>

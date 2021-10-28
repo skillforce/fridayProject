@@ -1,7 +1,7 @@
 import s from './sortBtn.module.css';
 import React from 'react';
-import {sortCardsStatusType} from '../../../../bll/redusers/card-reducer';
-import {SortPackType} from '../../../../bll/redusers/tablet-reducer';
+import {sortCardsStatusType} from '../../../bll/redusers/card-reducer';
+import {SortPackType} from '../../../bll/redusers/tablet-reducer';
 
 
 const{activeBtn}=s;
