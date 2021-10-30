@@ -1,7 +1,7 @@
 import {Dispatch} from 'redux';
 import {CardAPI, newCardDataType, newUpdateCardDataType} from '../../dal/Api';
 import {AppStoreType} from '../store/store';
-import {loadingStatusType, SetLoadingStatus} from './tablet-reducer';
+import {loadingStatusType} from './tablet-reducer';
 
 
 const SET_CARD_INFO = 'CardReducer/SET_CARD_INFO';

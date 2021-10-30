@@ -26,7 +26,7 @@ import {
     sortCardsStatusType, UpdateCard
 } from '../../../bll/redusers/card-reducer';
 import {Preloader} from '../../common/Preloader/Preloader';
-import SuperSelect from '../../common/c5-SuperSelect/SuperSelect';
+
 import Login from '../login/login';
 import {ResponsePage} from '../../common/ResponsePage/ResponsePage';
 import {SortBtn} from '../../common/sortBtn/sortBtn';

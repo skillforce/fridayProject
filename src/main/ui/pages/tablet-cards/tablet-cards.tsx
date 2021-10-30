@@ -30,6 +30,9 @@ import {SortBtn} from '../../common/sortBtn/sortBtn';
 import {CardOnly} from './CardOnly/CardOnly';
 import {CardsDeckProfile} from './CardsDeckProfile/CardsDeckProfile';
 import {SearchBlock} from '../../common/SearchBlock/SearchBlock';
+import {Modal} from '../../common/Modal/Modal';
+import SuperInputText from '../../common/c1-SuperInputText/SuperInputText';
+import SuperCheckbox from '../../common/c3-SuperCheckbox/SuperCheckbox';
 
 
 export const TabletCards = () => {
@@ -50,6 +53,8 @@ export const TabletCards = () => {
     const selectParamsOptions: SearchTextType[] = ['By name', 'By creator']
     const [selectedParams, setOptionParams] = useState<SearchTextType>(selectParamsOptions[0]);
 
+
+    const[activeModal,setActiveModal]=useState<boolean>(false)
 
     const {
         cardPacks,
@@ -146,8 +151,11 @@ export const TabletCards = () => {
 
     return (
         <>
+            <Modal active={activeModal} setActive={setActiveModal}>
+                <div><SuperInputText label={'Name of Deck'}/></div>
+            </Modal>
             <div className={s.profile}>
-                <CardsDeckProfile cardPacksTotalCount={cardPacksTotalCount} avatar={avatar} name={name} _id={_id}
+                <CardsDeckProfile setActiveModal={setActiveModal} cardPacksTotalCount={cardPacksTotalCount} avatar={avatar} name={name} _id={_id}
                                   onAddNewCardsClickHandler={onAddNewCardsClickHandler}
                                   rangeValue={rangeValue} onClickSearchBtnHandler={onClickSearchBtnHandler}
                                   onChangeRangeHandler={onChangeRangeHandler}/>
@@ -191,6 +199,7 @@ export const TabletCards = () => {
             </div>
             <Paginator pageForSearchMode={pageForSearchMode} searchMode={searchMode}
                        totalItemsCount={cardPacksTotalCount} currentPage={currentPage} pageSize={pageCount}/>
+
         </>
     );
 }

@@ -16,6 +16,7 @@ type CardsDeckProfilePropsType = {
     onClickSearchBtnHandler: (newMinMaxCurrent?: number[], sortBy?: SearchTextType) => void
     onChangeRangeHandler: (newRangeValue: number[]) => void
     cardPacksTotalCount: number | null
+    setActiveModal?:(newActiveStatus:boolean)=>void
 }
 
 export const CardsDeckProfile = (props: CardsDeckProfilePropsType) => {
@@ -28,7 +29,8 @@ export const CardsDeckProfile = (props: CardsDeckProfilePropsType) => {
         rangeValue,
         onClickSearchBtnHandler,
         onChangeRangeHandler,
-        cardPacksTotalCount
+        cardPacksTotalCount,
+        setActiveModal
     } = props;
     return (
         <div className={user}>
@@ -42,7 +44,8 @@ export const CardsDeckProfile = (props: CardsDeckProfilePropsType) => {
                 <div className={about}>
                     {_id}
                 </div>
-                <SuperButton onClick={onAddNewCardsClickHandler}>ADD NEW DECK</SuperButton>
+                {/*<SuperButton onClick={onAddNewCardsClickHandler}>ADD NEW DECK</SuperButton>*/}
+                {setActiveModal && <SuperButton onClick={()=>setActiveModal(true)}>ADD NEW DECK</SuperButton>}
             </div>
 
             <div className={polz}>

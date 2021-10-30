@@ -9,6 +9,7 @@ import TabletCards from '../pages/tablet-cards/tablet-cards';
 import SetNewPassword from '../pages/setNewPassword/setNewPassword';
 import React from 'react';
 import Card from '../pages/card/card';
+import {CardGame} from '../pages/cardGame/cardGame';
 
 export const PATH = {
     ERROR_404: '/err404',
@@ -19,7 +20,8 @@ export const PATH = {
     TEST: '/test',
     CREATE_NEW_PASS:'/set-new-password/:token',
     CARDS_TABLET:'/cards-tablet',
-    CARD:'/card/:token'
+    CARD:'/card/:token',
+    CARD_GAME:'/game/:token'
 }
 
 
@@ -37,6 +39,7 @@ export const Routes = () => {
                 <Route path={PATH.CREATE_NEW_PASS} render={() => <SetNewPassword/>}/>
                 <Route path={PATH.CARDS_TABLET} render={() => <TabletCards/>}/>
                 <Route path={PATH.CARD} render={() => <Card/>}/>
+                <Route path={PATH.CARD_GAME} render={() => <CardGame/>}/>
 
                 <Route render={() => <Error404/>}/>
 

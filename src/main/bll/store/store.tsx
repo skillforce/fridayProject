@@ -11,6 +11,7 @@ import ProfileReducer from '../redusers/profile-reducer';
 import {AppReducer} from '../redusers/app-reducer';
 import TabletReducer from '../redusers/tablet-reducer';
 import CardReducer from '../redusers/card-reducer';
+import {cardGameReducer} from '../redusers/card-game-reducer';
 
 
 const reducers = combineReducers({
@@ -23,7 +24,8 @@ const reducers = combineReducers({
     profile: ProfileReducer,
     app: AppReducer,
     tablet: TabletReducer,
-    card: CardReducer
+    card: CardReducer,
+    cardGame:cardGameReducer
 })
 
 

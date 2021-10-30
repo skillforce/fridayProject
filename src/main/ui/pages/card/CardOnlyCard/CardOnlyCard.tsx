@@ -33,12 +33,12 @@ export const CardOnlyCard = (props:CardOnlyPropsType)=>{
             <td>{t.answer}</td>
             <td>{t.grade.toFixed(1)}</td>
             <td>{new Date(t.updated).toLocaleDateString()}</td>
-            <td><SuperButton onClick={() => {
+           <td>{profileId===t.user_id && <SuperButton onClick={() => {
                 onDeleteCardHandler(t._id, t.cardsPack_id)
-            }}>DELETE</SuperButton>
-                <SuperButton onClick={() => {
+            }}>DELETE</SuperButton>}
+               {profileId===t.user_id &&<SuperButton onClick={() => {
                     onUpdateCardHandler(t._id, t.cardsPack_id)
-                }}>UPDATE</SuperButton></td>
+                }}>UPDATE</SuperButton>}</td>
         </tr>)}
     {searchCardArr && searchCardArr[pageForSearchCardMode].map(t =>
         <tr key={t.cardsPack_id}>
@@ -46,12 +46,12 @@ export const CardOnlyCard = (props:CardOnlyPropsType)=>{
             <td>{t.answer}</td>
             <td>{t.grade.toFixed(1)}</td>
             <td>{new Date(t.updated).toLocaleDateString()}</td>
-            <td className={btnBlock}><SuperButton onClick={() => {
+            <td className={btnBlock}> {profileId===t.user_id && <SuperButton onClick={() => {
                 onDeleteCardHandler(t._id, t.cardsPack_id)
-            }}>DELETE</SuperButton>
-                <SuperButton onClick={() => {
+            }}>DELETE</SuperButton>}
+                {profileId===t.user_id && <SuperButton onClick={() => {
                     onUpdateCardHandler(t._id, t.cardsPack_id)
-                }}>UPDATE</SuperButton></td>
+                }}>UPDATE</SuperButton>}</td>
         </tr>)}
 </tbody>
     )

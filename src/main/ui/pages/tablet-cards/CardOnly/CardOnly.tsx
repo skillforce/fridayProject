@@ -3,59 +3,71 @@ import SuperButton from '../../../common/c2-SuperButton/SuperButton';
 import React from 'react';
 import {cardType} from '../../../../bll/redusers/tablet-reducer';
 import s from './CardOnly.module.css';
+import {PATH} from '../../../routes/Routes';
 
 
-type CardOnlyPropsType ={
-    searchEmpty:string
-    cardPacks:cardType[]
-    searchCardsArr:Array<cardType[]> | null
-    pageForSearchMode:number
-    profileId:string|null
-    onDeleteCardsHandler:(CardId:string)=>void
-    onClickUpdateHandler:(CardId:string)=>void
+type CardOnlyPropsType = {
+    searchEmpty: string
+    cardPacks: cardType[]
+    searchCardsArr: Array<cardType[]> | null
+    pageForSearchMode: number
+    profileId: string | null
+    onDeleteCardsHandler: (CardId: string) => void
+    onClickUpdateHandler: (CardId: string) => void
 
 }
 
-const{tableTitle,btnBlock}=s
+const {tableTitle, btnBlock} = s
 
 
-export const CardOnly = (props:CardOnlyPropsType)=>{
+export const CardOnly = (props: CardOnlyPropsType) => {
 
-    const{pageForSearchMode,searchEmpty,cardPacks,searchCardsArr,onDeleteCardsHandler,onClickUpdateHandler,profileId}=props
+    const {
+        pageForSearchMode,
+        searchEmpty,
+        cardPacks,
+        searchCardsArr,
+        onDeleteCardsHandler,
+        onClickUpdateHandler,
+        profileId
+    } = props
 
-    return(
+    return (
         <tbody>
         {searchEmpty &&
-        <div className={tableTitle} >{searchEmpty}</div>}
-    {cardPacks && cardPacks.map((t:any) =>
-        <tr key={t._id}>
-            <td>{t.name}</td>
-            <td>{t.cardsCount}</td>
-            <td>{t.updated ? new Date(t.updated).toLocaleDateString() : ''}</td>
-            <td>{t.user_name}</td>
-            <td className={btnBlock}><NavLink
-                to={'/card/' + t._id}><SuperButton>Learn</SuperButton></NavLink>
-                {t.user_id === profileId &&
-                <SuperButton onClick={() => onDeleteCardsHandler(t._id)}>del</SuperButton>}
-                {t.user_id === profileId &&
-                <SuperButton onClick={() => onClickUpdateHandler(t._id)}>update</SuperButton>}
-            </td>
-        </tr>)}
+        <div className={tableTitle}>{searchEmpty}</div>}
+        {cardPacks && cardPacks.map((t: any) =>
+            <tr key={t._id}>
+                <td>{t.name}</td>
+                <td>{t.cardsCount}</td>
+                <td>{t.updated ? new Date(t.updated).toLocaleDateString() : ''}</td>
+                <td>{t.user_name}</td>
+                <td className={btnBlock}><NavLink
+                    to={'/card/' + t._id}><SuperButton>look</SuperButton></NavLink>
+                    {t.cardsCount !== 0 && <NavLink to={'/game/' + t._id}><SuperButton>play</SuperButton></NavLink>}
+                    {t.user_id === profileId &&
+                    <SuperButton onClick={() => onDeleteCardsHandler(t._id)}>del</SuperButton>}
+                    {t.user_id === profileId &&
+                    <SuperButton onClick={() => onClickUpdateHandler(t._id)}>update</SuperButton>}
+                </td>
+            </tr>)}
 
-    {searchCardsArr && searchCardsArr[pageForSearchMode].map((t:any) =>
-        <tr key={t._id}>
-            <td>{t.name}</td>
-            <td>{t.cardsCount}</td>
-            <td>{t.updated ? new Date(t.updated).toLocaleDateString() : ''}</td>
-            <td>{t.user_name}</td>
-            <td className={btnBlock}><NavLink
-                to={'/card/' + t._id}><SuperButton>Learn</SuperButton></NavLink>
-                {t.user_id === profileId &&
-                <SuperButton onClick={() => onDeleteCardsHandler(t._id)}>del</SuperButton>}
-                {t.user_id === profileId &&
-                <SuperButton onClick={() => onClickUpdateHandler(t._id)}>update</SuperButton>}
-            </td>
-        </tr>)}
+        {searchCardsArr && searchCardsArr[pageForSearchMode].map((t: any) =>
+            <tr key={t._id}>
+                <td>{t.name}</td>
+                <td>{t.cardsCount}</td>
+                <td>{t.updated ? new Date(t.updated).toLocaleDateString() : ''}</td>
+                <td>{t.user_name}</td>
+                <td className={btnBlock}><NavLink
+                    to={'/card/' + t._id}><SuperButton>look</SuperButton></NavLink>
+
+                    {t.cardsCount !== 0 && <NavLink to={'/game/' + t._id}><SuperButton>play</SuperButton></NavLink>}
+                    {t.user_id === profileId &&
+                    <SuperButton onClick={() => onDeleteCardsHandler(t._id)}>del</SuperButton>}
+                    {t.user_id === profileId &&
+                    <SuperButton onClick={() => onClickUpdateHandler(t._id)}>update</SuperButton>}
+                </td>
+            </tr>)}
         </tbody>
     )
 }

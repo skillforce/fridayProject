@@ -99,7 +99,7 @@ let InitialState = {
 
 export type InitialStateTabletType = typeof InitialState
 
-export const TabletReducer = (state: InitialStateTabletType = InitialState, action: AllTabletActionType): any => {
+export const TabletReducer = (state: InitialStateTabletType = InitialState, action: AllTabletActionType):any => {
     switch (action.type) {
         case SET_TABLET_INFO :
             return {

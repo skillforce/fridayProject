@@ -152,6 +152,9 @@ export const CardAPI = {
     },
     updateCard(newCardParams: newUpdateCardDataType) {
         return instance.put('/cards/card', {card: {...newCardParams}})
+    },
+    gradeCard(grade:number,card_id:string){
+        return instance.put('/cards/grade',{grade,card_id})
     }
 
 }

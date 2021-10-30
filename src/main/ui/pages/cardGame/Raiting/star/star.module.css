@@ -1,0 +1,14 @@
+.starOn{
+    width:35px;
+    height:35px;
+    margin:5px;
+    cursor: pointer;
+}
+
+.starOf{
+    width:35px;
+    height:35px;
+    opacity: 50%;
+    margin:5px;
+    cursor:pointer;
+}
