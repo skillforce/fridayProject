@@ -80,149 +80,150 @@ export const useInput = (initialValue: any, validator: ValidatorType) => {
     const onChange = (e: ChangeEvent<HTMLInputElement> | any) => {
         if (e.hasOwnProperty('target')) {
             setValue(e.target.value)
-        } else {
-            setValue(e)
-        }
-    }
-
-    const onBlur = (t: boolean) => {
-        setTouched(t)
-    }
-
-    return {
-        value,
-        touched,
-        onChange,
-        onBlur,
-        ...valid
-    }
-
-}
-
-const Login = () => {
-
-    const email = useInput('', {isEmpty: true, minLength: 3, maxLength: 50, isValidEmail: false});
-    const password = useInput('', {isEmpty: true, minLength: 7, maxLength: 20});
-    const rememberMe = useInput(false, {isEmpty: true, minLength: 7, maxLength: 20});
-
-    const isEmptyEmailMsg = email.touched && email.isEmpty;
-    const isEmptyPassMsg = password.touched && password.isEmpty
-    //проверка на пустоту
-
-    const minLengthEmailMsg = email.touched && email.minLengthError;
-    const minLengthPassMsg = password.touched && password.minLengthError;
-    // проверка на минимальную длинну
-
-    const isValidEmailMsg = email.touched && email.isValidEmailError;
-    const maxLengthPassMsg = password.touched && password.maxLengthError;
-    // проверка на валидность имейла и максимальную длинну пароля
-
-
-    const isLoginDisabled = !email.inputValid || !password.inputValid;
-    //отключаем кнопку если хоть одна ошибка есть
-
-    const dispatch = useDispatch();
-
-    const ErrorRequestMsg = useSelector<AppStoreType, string>(state => state.login.logInError);
-    const isLogin = useSelector<AppStoreType, boolean>(state => state.login.logIn);
-    const isLoading = useSelector<AppStoreType, boolean>(state => state.login.isLoading);
-
-
-    const onClickHandler = () => {
-        const requestData = {
-            email: email.value,
-            password: password.value,
-            rememberMe: rememberMe.value
+            } else {
+                setValue(e)
+            }
         }
 
-        dispatch(logInTC(requestData));
-        email.onChange('')
-        email.onBlur(false)
-        password.onChange('')
-        password.onBlur(false)
-        rememberMe.onChange(false)
+        const onBlur = (t: boolean) => {
+            setTouched(t)
+        }
+
+        return {
+            value,
+            touched,
+            onChange,
+            onBlur,
+            ...valid
+        }
 
     }
 
+    const Login = () => {
 
-    const onClickForgotHandler=()=>{
-        dispatch(SetIsMessageSend('error')) //чтобы если вдруг после редиректа на логин из восстановления пароля пользователь решит снова зайти на забыл пароль
-    }
+        const email = useInput('', {isEmpty: true, minLength: 3, maxLength: 50, isValidEmail: false});
+        const password = useInput('', {isEmpty: true, minLength: 7, maxLength: 20});
+        const rememberMe = useInput(false, {isEmpty: true, minLength: 7, maxLength: 20});
 
-    const signUpClickHandler = () => {
-        dispatch(setIsValidReg(false))
-    }
+        const isEmptyEmailMsg = email.touched && email.isEmpty;
+        const isEmptyPassMsg = password.touched && password.isEmpty
+        //проверка на пустоту
 
+        const minLengthEmailMsg = email.touched && email.minLengthError;
+        const minLengthPassMsg = password.touched && password.minLengthError;
+        // проверка на минимальную длинну
 
-    if (email.touched || email.value || password.touched || password.value) {
-        dispatch(setLoginError(''))
-    }
-
-
-    if (isLoading) {
-        return <Preloader/>
-    }
-
-
-    if (isLogin) {
-        return <Redirect to={PATH.PROFILE}/>
-    }
+        const isValidEmailMsg = email.touched && email.isValidEmailError;
+        const maxLengthPassMsg = password.touched && password.maxLengthError;
+        // проверка на валидность имейла и максимальную длинну пароля
 
 
-    return (
-        <div className={cn.autorization}>
-            <div className={cn.form}>
-                <div className={cn.hTit}>
-                    It-incubator
+        const isLoginDisabled = !email.inputValid || !password.inputValid;
+        //отключаем кнопку если хоть одна ошибка есть
+
+        const dispatch = useDispatch();
+
+        const ErrorRequestMsg = useSelector<AppStoreType, string>(state => state.login.logInError);
+        const isLogin = useSelector<AppStoreType, boolean>(state => state.login.logIn);
+        const isLoading = useSelector<AppStoreType, boolean>(state => state.login.isLoading);
+
+
+        const onClickHandler = () => {
+            const requestData = {
+                email: email.value,
+                password: password.value,
+                rememberMe: rememberMe.value
+            }
+
+            dispatch(logInTC(requestData));
+            email.onChange('')
+            email.onBlur(false)
+            password.onChange('')
+            password.onBlur(false)
+            rememberMe.onChange(false)
+
+        }
+
+
+        const onClickForgotHandler = () => {
+            dispatch(SetIsMessageSend('error')) //чтобы если вдруг после редиректа на логин из восстановления пароля пользователь решит снова зайти на забыл пароль
+        }
+
+        const signUpClickHandler = () => {
+            dispatch(setIsValidReg(false))
+        }
+
+
+        if (email.touched || email.value || password.touched || password.value) {
+            dispatch(setLoginError(''))
+        }
+
+
+        if (isLoading) {
+            return <Preloader/>
+        }
+
+
+        if (isLogin) {
+            return <Redirect to={PATH.PROFILE}/>
+        }
+
+
+        return (
+            <div className={cn.autorization}>
+                <div className={cn.form}>
+                    <div className={cn.hTit}>
+                        It-incubator
+                    </div>
+                    <div className={cn.tit}>
+                        Login
+                    </div>
+                    <form action="">
+
+
+                        {ErrorRequestMsg && <div style={{color: 'red'}}>{ErrorRequestMsg}</div>}
+
+
+                        <ErrorWindow isEmptyEmailMsg={isEmptyEmailMsg} minLengthEmailMsg={minLengthEmailMsg}
+                                     isValidEmailMsg={isValidEmailMsg}/>
+
+
+                        <SuperInputText onChange={email.onChange} onBlur={() => {
+                            email.onBlur(true)
+                        }} value={email.value}
+                                        label={'Email'}/>
+
+                        <ErrorWindow isEmptyPassMsg={isEmptyPassMsg} minLengthPassMsg={minLengthPassMsg}
+                                     maxLengthPassMsg={maxLengthPassMsg}/>
+
+
+                        <SuperInputText onChange={password.onChange} onBlur={() => {
+                            password.onBlur(true)
+                        }} value={password.value}
+                                        label={'Password'} type={'password'}/>
+
+
+                        <input value={rememberMe.value} onChange={rememberMe.onChange} type={'checkbox'}/> remember me
+
+
+                        <NavLink onClick={onClickForgotHandler} className={cn.linkforgot} to={PATH.RECOVER_PASS}>Forgot
+                            password</NavLink>
+
+
+                        <div><NavLink onClick={signUpClickHandler} className={cn.linkforgot} to={PATH.REGISTRATION}>Sign
+                            up</NavLink></div>
+                        {/*Если пользователь который только что зарегался решит еще раз зарегаться нам нужно откатить IsValidRec в registration reducer*/}
+
+
+                        <SuperButton onClick={onClickHandler} disabled={isLoginDisabled}
+                                     style={{width: 280, marginTop: 80, marginBottom: 40}}>Login</SuperButton>
+
+
+                    </form>
                 </div>
-                <div className={cn.tit}>
-                    Login
-                </div>
-                <form action="">
-
-
-                    {ErrorRequestMsg && <div style={{color:'red'}}>{ErrorRequestMsg}</div>}
-
-
-                    <ErrorWindow isEmptyEmailMsg={isEmptyEmailMsg} minLengthEmailMsg={minLengthEmailMsg}
-                                 isValidEmailMsg={isValidEmailMsg}/>
-
-
-                    <SuperInputText onChange={email.onChange} onBlur={() => {
-                        email.onBlur(true)
-                    }} value={email.value}
-                                    label={'Email'}/>
-
-                    <ErrorWindow isEmptyPassMsg={isEmptyPassMsg} minLengthPassMsg={minLengthPassMsg}
-                                 maxLengthPassMsg={maxLengthPassMsg}/>
-
-
-                    <SuperInputText onChange={password.onChange} onBlur={() => {
-                        password.onBlur(true)
-                    }} value={password.value}
-                                    label={'Password'} type={'password'}/>
-
-
-                    <input value={rememberMe.value} onChange={rememberMe.onChange} type={'checkbox'}/> remember me
-
-
-                    <NavLink onClick={onClickForgotHandler} className={cn.linkforgot} to={PATH.RECOVER_PASS}>Forgot password</NavLink>
-
-
-                    <div><NavLink onClick={signUpClickHandler} className={cn.linkforgot} to={PATH.REGISTRATION}>Sign
-                        up</NavLink></div>
-                    {/*Если пользователь который только что зарегался решит еще раз зарегаться нам нужно откатить IsValidRec в registration reducer*/}
-
-
-                    <SuperButton onClick={onClickHandler} disabled={isLoginDisabled}
-                                 style={{width: 280, marginTop: 80, marginBottom: 40}}>Login</SuperButton>
-
-
-                </form>
             </div>
-        </div>
-    );
-}
+        );
+    }
 
-export default Login;
+    export default Login;
 

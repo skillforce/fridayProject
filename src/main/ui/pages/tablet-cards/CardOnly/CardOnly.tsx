@@ -3,7 +3,6 @@ import SuperButton from '../../../common/c2-SuperButton/SuperButton';
 import React from 'react';
 import {cardType} from '../../../../bll/redusers/tablet-reducer';
 import s from './CardOnly.module.css';
-import {PATH} from '../../../routes/Routes';
 
 
 type CardOnlyPropsType = {
@@ -12,8 +11,10 @@ type CardOnlyPropsType = {
     searchCardsArr: Array<cardType[]> | null
     pageForSearchMode: number
     profileId: string | null
-    onDeleteCardsHandler: (CardId: string) => void
-    onClickUpdateHandler: (CardId: string) => void
+    setActiveModalUpdateDeck: (newActiveStatus: boolean) => void
+    setActiveModalDeleteDeck: (newActiveStatus: boolean) => void
+    setCardIdInModal: (newId: string) => void
+    setNameDeck: (newText: string) => void
 
 }
 
@@ -27,10 +28,23 @@ export const CardOnly = (props: CardOnlyPropsType) => {
         searchEmpty,
         cardPacks,
         searchCardsArr,
-        onDeleteCardsHandler,
-        onClickUpdateHandler,
-        profileId
+        profileId,
+        setActiveModalUpdateDeck,
+        setCardIdInModal,
+        setActiveModalDeleteDeck,
+        setNameDeck
     } = props
+
+    const onClickUpdateBtnHandler = (newId: string, name: string) => {
+        setCardIdInModal(newId)
+        setNameDeck(name)
+        setActiveModalUpdateDeck(true)
+    }
+    const onClickDeleteBtnHandler = (newId: string) => {
+        setCardIdInModal(newId)
+        setActiveModalDeleteDeck(true)
+    }
+
 
     return (
         <tbody>
@@ -46,9 +60,9 @@ export const CardOnly = (props: CardOnlyPropsType) => {
                     to={'/card/' + t._id}><SuperButton>look</SuperButton></NavLink>
                     {t.cardsCount !== 0 && <NavLink to={'/game/' + t._id}><SuperButton>play</SuperButton></NavLink>}
                     {t.user_id === profileId &&
-                    <SuperButton onClick={() => onDeleteCardsHandler(t._id)}>del</SuperButton>}
+                    <SuperButton onClick={() => onClickDeleteBtnHandler(t._id)}>del</SuperButton>}
                     {t.user_id === profileId &&
-                    <SuperButton onClick={() => onClickUpdateHandler(t._id)}>update</SuperButton>}
+                    <SuperButton onClick={() => onClickUpdateBtnHandler(t._id, t.name)}>update</SuperButton>}
                 </td>
             </tr>)}
 
@@ -63,9 +77,9 @@ export const CardOnly = (props: CardOnlyPropsType) => {
 
                     {t.cardsCount !== 0 && <NavLink to={'/game/' + t._id}><SuperButton>play</SuperButton></NavLink>}
                     {t.user_id === profileId &&
-                    <SuperButton onClick={() => onDeleteCardsHandler(t._id)}>del</SuperButton>}
+                    <SuperButton onClick={() => onClickDeleteBtnHandler(t._id)}>del</SuperButton>}
                     {t.user_id === profileId &&
-                    <SuperButton onClick={() => onClickUpdateHandler(t._id)}>update</SuperButton>}
+                    <SuperButton onClick={() => onClickUpdateBtnHandler(t._id, t.name)}>update</SuperButton>}
                 </td>
             </tr>)}
         </tbody>

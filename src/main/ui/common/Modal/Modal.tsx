@@ -7,6 +7,7 @@ type ModalPropsType = {
     active: boolean
     setActive: (newActiveStatus: boolean) => void
     children:any
+
 }
 
 

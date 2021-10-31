@@ -141,6 +141,28 @@
 }
 
 
+.addDeckModal{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.addDeckModal div{
+    margin-bottom: 25px;
+}
+
+.DelDeckModal{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.DelDeckModal div{
+    margin: 15px 0 0 10px;
+}
+
+
 
 
 

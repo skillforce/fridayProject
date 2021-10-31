@@ -12,7 +12,6 @@ type CardsDeckProfilePropsType = {
     avatar: string | null
     name: string | null
     _id: string | null
-    onAddNewCardHandler: (cardsPack_id: string) => void
     gradeCardValue: number[]
     onClickSearchModeCardHandler: (newGradeValue: number[], sortBy: SearchCardTextType) => void
     onChangeGradeHandler: (newRangeValue: number[]) => void
@@ -22,15 +21,30 @@ type CardsDeckProfilePropsType = {
     searchCardMode: boolean
     selectedCardParams: SearchCardTextType
     onClickSearchCardHandler: (newGradeValue: number[] | undefined, sortBy?: SearchCardTextType) => void
+    setActiveModalAddCard: (newStatus: boolean) => void
+    setCardPack_id: (newText: string) => void
+
+
 }
 
 export const CardProfile = (props: CardsDeckProfilePropsType) => {
-    const {user, user_card, logo, name_profile, about, polz, polztit, rangeValues, rangeClass,currentCard,rangeLine} = s;
+    const {
+        user,
+        user_card,
+        logo,
+        name_profile,
+        about,
+        polz,
+        polztit,
+        rangeValues,
+        rangeClass,
+        currentCard,
+        rangeLine
+    } = s;
     const {
         avatar,
         name,
         _id,
-        onAddNewCardHandler,
         gradeCardValue,
         onClickSearchModeCardHandler,
         onChangeGradeHandler,
@@ -39,9 +53,18 @@ export const CardProfile = (props: CardsDeckProfilePropsType) => {
         token,
         searchCardMode,
         selectedCardParams,
-        onClickSearchCardHandler
+        onClickSearchCardHandler,
+        setActiveModalAddCard,
+        setCardPack_id,
 
     } = props;
+
+    const onAddNewCardModalHandler = (newCardId: string) => {
+        setActiveModalAddCard(true)
+        setCardPack_id(token)
+    }
+
+
     return (
         <div className={user}>
             <div className={user_card}>
@@ -55,7 +78,7 @@ export const CardProfile = (props: CardsDeckProfilePropsType) => {
                     {_id}
                 </div>
                 <SuperButton disabled={!(_id === packUserId)} onClick={() => {
-                    onAddNewCardHandler(token)
+                    onAddNewCardModalHandler(token)
                 }}>ADD NEW CARD</SuperButton>
             </div>
 
@@ -71,8 +94,8 @@ export const CardProfile = (props: CardsDeckProfilePropsType) => {
                 </div>
                 <div className={rangeClass}>
                     <div className={rangeLine}>
-                    <Range step={0.1} min={0} max={5} defaultValue={gradeCardValue} value={gradeCardValue}
-                           onChange={onChangeGradeHandler}/>
+                        <Range step={0.1} min={0} max={5} defaultValue={gradeCardValue} value={gradeCardValue}
+                               onChange={onChangeGradeHandler}/>
                     </div>
                     {!searchCardMode &&
                     <SuperButton onClick={() => onClickSearchCardHandler(gradeCardValue)}>search</SuperButton>}

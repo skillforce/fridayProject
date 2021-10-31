@@ -55,7 +55,7 @@ export type ParamsAddNewCardsType = {
 export type CardsPackType = {
     name?: string,
     deckCover?: string
-    privated?: boolean
+    private?: boolean
 }
 export type CardParamType = {
     cardsPack_id: string
@@ -133,8 +133,8 @@ export const CardsPackAPI = {
     deleteCards(cardId: string) {
         return instance.delete('/cards/pack', {params: {id: cardId}})
     },
-    updateCards(cardId: string) {
-        return instance.put('/cards/pack', {cardsPack: {_id: cardId, name: 'new_cards_name'}})
+    updateCards(cardsPack:{_id: string, name?: string} ) {
+        return instance.put('/cards/pack', {cardsPack:{...cardsPack}})
     }
 
 }

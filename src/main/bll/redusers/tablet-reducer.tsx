@@ -279,11 +279,11 @@ export const DeleteCards = (cardId: string) => {
             })
     }
 }
-export const updateCards = (cardId: string) => {
+export const updateCards = (cardId: string,newName?:string) => {
     return (dispatch: Dispatch<any>, getState: () => AppStoreType) => {
         const searchMode = getState().tablet.searchMode
         dispatch(SetLoadingStatus('loading'));
-        CardsPackAPI.updateCards(cardId)
+        CardsPackAPI.updateCards({_id:cardId,name:newName})
             .then(res => searchMode ? dispatch(SearchCorrectCards()) : dispatch(getCarsPack()))
             .catch(error => {
                 dispatch(SetErrorText(error.toString()))

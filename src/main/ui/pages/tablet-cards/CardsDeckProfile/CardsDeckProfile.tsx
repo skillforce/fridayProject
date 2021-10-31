@@ -11,26 +11,24 @@ type CardsDeckProfilePropsType = {
     avatar: string | null
     name: string | null
     _id: string | null
-    onAddNewCardsClickHandler: () => void
     rangeValue: number[]
     onClickSearchBtnHandler: (newMinMaxCurrent?: number[], sortBy?: SearchTextType) => void
     onChangeRangeHandler: (newRangeValue: number[]) => void
     cardPacksTotalCount: number | null
-    setActiveModal?:(newActiveStatus:boolean)=>void
+    setActiveModalAddDeck?: (newActiveStatus: boolean) => void
 }
 
 export const CardsDeckProfile = (props: CardsDeckProfilePropsType) => {
-    const {user, user_card, logo, name_profile, about, polz, polztit, rangeValues,rangeClass} = s;
+    const {user, user_card, logo, name_profile, about, polz, polztit, rangeValues, rangeClass} = s;
     const {
         avatar,
         name,
         _id,
-        onAddNewCardsClickHandler,
         rangeValue,
         onClickSearchBtnHandler,
         onChangeRangeHandler,
         cardPacksTotalCount,
-        setActiveModal
+        setActiveModalAddDeck
     } = props;
     return (
         <div className={user}>
@@ -44,8 +42,7 @@ export const CardsDeckProfile = (props: CardsDeckProfilePropsType) => {
                 <div className={about}>
                     {_id}
                 </div>
-                {/*<SuperButton onClick={onAddNewCardsClickHandler}>ADD NEW DECK</SuperButton>*/}
-                {setActiveModal && <SuperButton onClick={()=>setActiveModal(true)}>ADD NEW DECK</SuperButton>}
+                {setActiveModalAddDeck && <SuperButton onClick={() => setActiveModalAddDeck(true)}>ADD NEW DECK</SuperButton>}
             </div>
 
             <div className={polz}>
@@ -57,8 +54,8 @@ export const CardsDeckProfile = (props: CardsDeckProfilePropsType) => {
                     <div>max:{rangeValue[1]}</div>
                 </div>
                 <div className={rangeClass}>
-                <Range min={0} max={200} defaultValue={rangeValue} value={rangeValue}
-                       onChange={onChangeRangeHandler}/>
+                    <Range min={0} max={200} defaultValue={rangeValue} value={rangeValue}
+                           onChange={onChangeRangeHandler}/>
                 </div>
                 <SuperButton onClick={() => onClickSearchBtnHandler(rangeValue)}>search</SuperButton>
             </div>

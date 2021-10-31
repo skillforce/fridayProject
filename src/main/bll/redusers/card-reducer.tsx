@@ -256,7 +256,7 @@ export const AddCard = (newCardParams: newCardDataType) => {
         dispatch(SetLoadingCardStatus('loading'));
         const searchMode = getState().card.searchCardMode
         CardAPI.addNewCards(newCardParams)
-            .then(res => searchMode? dispatch(searchCard(newCardParams.cardsPack_id)) : dispatch(getCard(newCardParams.cardsPack_id)))
+            .then(res => searchMode ? dispatch(searchCard(newCardParams.cardsPack_id)) : dispatch(getCard(newCardParams.cardsPack_id)))
             .catch(error => {
                 dispatch(SetErrorCardText(error.toString()))
                 dispatch(SetLoadingCardStatus('error'));
@@ -271,7 +271,7 @@ export const UpdateCard = (newCardParams: newUpdateCardDataType, cardsPack_id: s
         dispatch(SetLoadingCardStatus('loading'));
         const searchMode = getState().card.searchCardMode
         CardAPI.updateCard(newCardParams)
-            .then(res =>  searchMode?  dispatch(searchCard(cardsPack_id)) : dispatch(getCard(cardsPack_id)))
+            .then(res => searchMode ? dispatch(searchCard(cardsPack_id)) : dispatch(getCard(cardsPack_id)))
             .catch(error => {
                 dispatch(SetErrorCardText(error.toString()))
                 dispatch(SetLoadingCardStatus('error'));
@@ -290,7 +290,7 @@ export const DeleteCard = (cardId: string, cardsPack_id: string) => {
         const searchMode = getState().card.searchCardMode
         dispatch(SetLoadingCardStatus('loading'));
         CardAPI.deleteCard(cardId)
-            .then(res =>  searchMode?  dispatch(searchCard(cardsPack_id)) : dispatch(getCard(cardsPack_id)))
+            .then(res => searchMode ? dispatch(searchCard(cardsPack_id)) : dispatch(getCard(cardsPack_id)))
             .catch(error => {
                 dispatch(SetErrorCardText(error.toString()))
                 dispatch(SetLoadingCardStatus('error'));

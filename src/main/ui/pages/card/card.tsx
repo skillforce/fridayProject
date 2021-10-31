@@ -6,35 +6,39 @@ import {useDispatch, useSelector} from 'react-redux';
 import {AppStoreType} from '../../../bll/store/store';
 import {InitialStateLoginType} from '../../../bll/redusers/profile-reducer';
 import 'rc-slider/assets/index.css';
-import {Redirect, useParams} from 'react-router-dom';
+import {NavLink, Redirect, useParams} from 'react-router-dom';
 import {PATH} from '../../routes/Routes';
 import Paginator from '../../common/Paginator/Paginator';
 import {
-    AddCard, DeleteCard,
+    AddCard,
+    DeleteCard,
     getCard,
     InitialStateCardType,
     OneCardsType,
     searchCard,
     SearchCardTextType,
-    SetGradeValue, SetPageCount,
+    SetGradeValue,
+    SetPageCount,
     SetSearchCardArr,
     SetSearchCardEmpty,
     SetSearchCardMode,
     SetSearchCardText,
     SetSearchedCardBy,
     SetSortCardStatus,
-    sortCardsStatusType, UpdateCard
+    sortCardsStatusType,
+    UpdateCard
 } from '../../../bll/redusers/card-reducer';
 import {Preloader} from '../../common/Preloader/Preloader';
 
-import Login from '../login/login';
+import Login, {useInput} from '../login/login';
 import {ResponsePage} from '../../common/ResponsePage/ResponsePage';
 import {SortBtn} from '../../common/sortBtn/sortBtn';
 import {InitialStateTabletType} from '../../../bll/redusers/tablet-reducer';
 import {CardOnlyCard} from './CardOnlyCard/CardOnlyCard';
 import {CardProfile} from './CardProfile/CardProfile';
-import {NavLink} from 'react-router-dom';
 import {SearchBlock} from '../../common/SearchBlock/SearchBlock';
+import {Modal} from '../../common/Modal/Modal';
+import {newCardDataType, newUpdateCardDataType} from '../../../dal/Api';
 
 
 export const Card = () => {
@@ -65,6 +69,15 @@ export const Card = () => {
     } = tabletInfo
 
 
+    const [activeModalAddCard, setActiveModalAddCard] = useState<boolean>(false)
+    const [activeModalDeleteCard, setActiveModalDeleteCard] = useState<boolean>(false)
+    const [activeModalUpdateCard, setActiveModalUpdateCard] = useState<boolean>(false)
+    const [cardPack_id, setCardPack_id] = useState<string>('')
+    const [card_id, setCard_id] = useState<string>('')
+    const questionInModal = useInput('', {isEmpty: true, minLength: 1, maxLength: 25});
+    const answerInModal = useInput('', {isEmpty: true, minLength: 1, maxLength: 25});
+    const gradeInModal = useInput(0, {isEmpty: true, minLength: 1, maxLength: 1});
+
     const onChangeGradeHandler = (newGradeValue: number[]) => {
         setGradeCardValue(newGradeValue)
     }
@@ -93,17 +106,46 @@ export const Card = () => {
         setSearch(e.currentTarget.value);
     };
 
-    const onAddNewCardHandler = (cardsPack_id: string) => {
-        dispatch(AddCard({cardsPack_id}))
+    const onAddNewCardHandler = () => {
+        const data: newCardDataType = {
+            cardsPack_id: cardPack_id,
+            question: questionInModal.value,
+            answer: answerInModal.value,
+            grade: gradeInModal.value
+        }
+        dispatch(AddCard(data))
+        setActiveModalAddCard(false)
+        questionInModal.onChange('')
+        answerInModal.onChange('')
+        gradeInModal.onChange('')
+        setCardPack_id('')
+        setCard_id('')
 
     };
-    const onDeleteCardHandler = (cardId: string, cardsPack_id: string) => {
 
-        dispatch(DeleteCard(cardId, cardsPack_id))
+    const onUpdateCardHandler = () => {
+        const data: newUpdateCardDataType = {
+            _id: card_id,
+            question: questionInModal.value,
+            answer: answerInModal.value,
+            grade: gradeInModal.value
+        }
+        dispatch(UpdateCard(data, cardPack_id,))
+        setActiveModalUpdateCard(false)
+        questionInModal.onChange('')
+        answerInModal.onChange('')
+        gradeInModal.onChange('')
+        setCardPack_id('')
+        setCard_id('')
 
     };
-    const onUpdateCardHandler = (_id: string, cardsPack_id: string) => {
-        dispatch(UpdateCard({_id, question: 'blablabla'}, cardsPack_id,))
+
+
+    const onDeleteCardHandler = () => {
+        dispatch(DeleteCard(card_id, cardPack_id))
+        setActiveModalDeleteCard(false)
+        setCardPack_id('')
+        setCard_id('')
 
     };
 
@@ -152,9 +194,61 @@ export const Card = () => {
 
     return (
         <>
+            <Modal active={activeModalAddCard} setActive={setActiveModalAddCard}>
+                <div className={s.addDeckModal}>
+                    <div>Card info:</div>
+                    <div><SuperInputText value={questionInModal.value} onChange={questionInModal.onChange}
+                                         onBlur={() => {
+                                             questionInModal.onBlur(true)
+                                         }} label={'Question'}/></div>
+                    <div><SuperInputText value={answerInModal.value} onChange={answerInModal.onChange} onBlur={() => {
+                        answerInModal.onBlur(true)
+                    }} label={'Answer'}/></div>
+                    {gradeInModal.value > 5 && <div>Grade should be less than 5</div>}
+                    {gradeInModal.value < 0 && <div>Grade should be more than 0</div>}
+                    <div><SuperInputText value={gradeInModal.value} onChange={gradeInModal.onChange} onBlur={() => {
+                        gradeInModal.onBlur(true)
+                    }} label={'Grade'}/></div>
+                    <div><SuperButton disabled={gradeInModal.value > 5 || gradeInModal.value < 0}
+                                      onClick={onAddNewCardHandler}>ADD NEW CARD</SuperButton></div>
+                </div>
+            </Modal>
+
+            <Modal active={activeModalUpdateCard} setActive={setActiveModalUpdateCard}>
+                <div className={s.addDeckModal}>
+                    <div>New card info:</div>
+                    <div><SuperInputText value={questionInModal.value} onChange={questionInModal.onChange}
+                                         onBlur={() => {
+                                             questionInModal.onBlur(true)
+                                         }} label={'Question'}/></div>
+                    <div><SuperInputText value={answerInModal.value} onChange={answerInModal.onChange} onBlur={() => {
+                        answerInModal.onBlur(true)
+                    }} label={'Answer'}/></div>
+                    {gradeInModal.value > 5 && <div>Grade should be less than 5</div>}
+                    {gradeInModal.value < 0 && <div>Grade should be more than 0</div>}
+                    <div><SuperInputText value={gradeInModal.value} onChange={gradeInModal.onChange} onBlur={() => {
+                        gradeInModal.onBlur(true)
+                    }} label={'Grade'}/></div>
+                    <div><SuperButton disabled={gradeInModal.value > 5 || gradeInModal.value < 0}
+                                      onClick={onUpdateCardHandler}>UPDATE</SuperButton></div>
+                </div>
+            </Modal>
+
+            <Modal active={activeModalDeleteCard} setActive={setActiveModalDeleteCard}>
+                <div className={s.addDeckModal}>
+                    <div>Are you sure?</div>
+                    <div className={s.DelDeckModal}>
+                        <div><SuperButton onClick={onDeleteCardHandler}>OK</SuperButton></div>
+                        <div><SuperButton onClick={() => setActiveModalDeleteCard(false)}>Cancel</SuperButton></div>
+                    </div>
+                </div>
+            </Modal>
+
+
             <div className={s.profile}>
-                <CardProfile avatar={avatar} name={name} _id={_id}
-                             onAddNewCardHandler={onAddNewCardHandler} gradeCardValue={gradeCardValue}
+                <CardProfile setCardPack_id={setCardPack_id} setActiveModalAddCard={setActiveModalAddCard}
+                             avatar={avatar} name={name} _id={_id}
+                             gradeCardValue={gradeCardValue}
                              onClickSearchModeCardHandler={onClickSearchModeCardHandler}
                              onChangeGradeHandler={onChangeGradeHandler} cardsTotalCount={cardsTotalCount}
                              packUserId={tabletInfo.packUserId} token={token}
@@ -166,9 +260,13 @@ export const Card = () => {
                     </div>
                     <br/>
                     <br/>
-                    <SearchBlock selectedParams={selectedCardParams} onHandlerSearch={onHandlerCardSearch} onClickSearchBtnHandler={onClickSearchCardHandler}
-                                 search={search} searchMode={searchCardMode} onAllPagesHandler={onAllCardPagesHandler} selectParamsOptions={selectParamsCardOptions} setOptionParams={setSelectedCardParams} searchProperty={selectParamsCardOptions}/>
-                    <NavLink to={PATH.CARDS_TABLET}><SuperButton onClick={onAllCardPagesHandler}>go to all decks </SuperButton></NavLink>
+                    <SearchBlock selectedParams={selectedCardParams} onHandlerSearch={onHandlerCardSearch}
+                                 onClickSearchBtnHandler={onClickSearchCardHandler}
+                                 search={search} searchMode={searchCardMode} onAllPagesHandler={onAllCardPagesHandler}
+                                 selectParamsOptions={selectParamsCardOptions} setOptionParams={setSelectedCardParams}
+                                 searchProperty={selectParamsCardOptions}/>
+                    <NavLink to={PATH.CARDS_TABLET}><SuperButton onClick={onAllCardPagesHandler}>go to all
+                        decks </SuperButton></NavLink>
                     <table className={s.mainTab}>
                         <thead>
                         <tr>
@@ -191,19 +289,21 @@ export const Card = () => {
                             <th>Action</th>
                         </tr>
                         </thead>
-                        <CardOnlyCard searchCardEmpty={searchCardEmpty} AllCards={AllCards}
-                                      searchCardArr={searchCardArr}
-                                      pageForSearchCardMode={pageForSearchCardMode} profileId={profile.profile._id}
-                                      onDeleteCardHandler={onDeleteCardHandler}
-                                      onUpdateCardHandler={onUpdateCardHandler}/>
+                        <CardOnlyCard
+                            setActiveModalDeleteCard={setActiveModalDeleteCard} setCard_id={setCard_id}
+                            setCardPack_id={setCardPack_id} setActiveModalUpdateCard={setActiveModalUpdateCard}
+                            onChangeQuestion={questionInModal.onChange}
+                            onChangeAnswer={answerInModal.onChange} onChangeGrade={gradeInModal.onChange}
+                            searchCardEmpty={searchCardEmpty} AllCards={AllCards}
+                            searchCardArr={searchCardArr}
+                            pageForSearchCardMode={pageForSearchCardMode} profileId={profile.profile._id}/>
                     </table>
                 </div>
             </div>
             <Paginator cardType={true} pageForSearchMode={pageForSearchCardMode} searchMode={searchCardMode}
                        totalItemsCount={cardsTotalCount} currentPage={page} pageSize={4}/>
         </>
-    )
-        ;
+    );
 }
 
 export default Card;

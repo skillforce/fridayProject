@@ -7,7 +7,8 @@ import {
     InitialStateTabletType,
     PostCards,
     SearchCorrectCards,
-    SearchTextType, SetCheckBoxValue,
+    SearchTextType,
+    SetCheckBoxValue,
     SetMinMaxCardsCurrent,
     SetSearchCardsArr,
     SetSearchedBy,
@@ -15,7 +16,8 @@ import {
     SetSearchMode,
     SetSearchText,
     SetSortStatus,
-    SortPackType, updateCards
+    SortPackType,
+    updateCards
 } from '../../../bll/redusers/tablet-reducer';
 import {AppStoreType} from '../../../bll/store/store';
 import {InitialStateLoginType} from '../../../bll/redusers/profile-reducer';
@@ -23,16 +25,16 @@ import Paginator from '../../common/Paginator/Paginator';
 import 'rc-slider/assets/index.css';
 import {Preloader} from '../../common/Preloader/Preloader';
 import {ResponsePage} from '../../common/ResponsePage/ResponsePage';
-import {NavLink, Redirect} from 'react-router-dom';
+import {Redirect} from 'react-router-dom';
 import {PATH} from '../../routes/Routes';
-import Login from '../login/login';
+import Login, {useInput} from '../login/login';
 import {SortBtn} from '../../common/sortBtn/sortBtn';
 import {CardOnly} from './CardOnly/CardOnly';
 import {CardsDeckProfile} from './CardsDeckProfile/CardsDeckProfile';
 import {SearchBlock} from '../../common/SearchBlock/SearchBlock';
 import {Modal} from '../../common/Modal/Modal';
 import SuperInputText from '../../common/c1-SuperInputText/SuperInputText';
-import SuperCheckbox from '../../common/c3-SuperCheckbox/SuperCheckbox';
+import SuperButton from '../../common/c2-SuperButton/SuperButton';
 
 
 export const TabletCards = () => {
@@ -54,7 +56,18 @@ export const TabletCards = () => {
     const [selectedParams, setOptionParams] = useState<SearchTextType>(selectParamsOptions[0]);
 
 
-    const[activeModal,setActiveModal]=useState<boolean>(false)
+    const [activeModalAddDeck, setActiveModalAddDeck] = useState<boolean>(false)
+    const [activeModalUpdateDeck, setActiveModalUpdateDeck] = useState<boolean>(false)
+    const [activeModalDeleteDeck, setActiveModalDeleteDeck] = useState<boolean>(false)
+    const [cardIdInModal, setCardIdInModal] = useState<string>('')
+    const nameInModal = useInput('', {isEmpty: true, minLength: 1, maxLength: 25});
+    const [checkBoxInModal, setCheckBoxInModal] = useState<boolean>(false)
+
+    const onChangeCheckBoxInModal = (newStatus: boolean) => {
+        setCheckBoxInModal(newStatus)
+
+    }
+
 
     const {
         cardPacks,
@@ -101,12 +114,23 @@ export const TabletCards = () => {
     const onSortBtnHandler = (newStatus: SortPackType) => {
         dispatch(SetSortStatus(newStatus))
     }
-    const onClickUpdateHandler = (cardId: string) => {
-        dispatch(updateCards(cardId))
+
+
+    const onClickUpdateHandler = () => {
+
+        dispatch(updateCards(cardIdInModal, nameInModal.value))
+        setActiveModalUpdateDeck(false)
+        nameInModal.onChange('')
+        nameInModal.onBlur(false)
+        setCardIdInModal('')
+
     }
 
-    const onDeleteCardsHandler = (cardId: string) => {
-        dispatch(DeleteCards(cardId))
+
+    const onDeleteCardsHandler = () => {
+        dispatch(DeleteCards(cardIdInModal))
+        setCardIdInModal('')
+        setActiveModalDeleteDeck(false)
     }
 
     const onChangeCheckBoxStatus = () => {
@@ -117,7 +141,17 @@ export const TabletCards = () => {
     };
 
     const onAddNewCardsClickHandler = () => {
-        dispatch(PostCards())
+
+        const addParams = {
+            name: nameInModal.value,
+            private: checkBoxInModal
+        }
+
+        dispatch(PostCards(addParams))
+        setActiveModalAddDeck(false)
+        nameInModal.onChange('')
+        nameInModal.onBlur(false)
+        onChangeCheckBoxInModal(false)
     };
 
     const onAllPagesHandler = () => {
@@ -151,12 +185,42 @@ export const TabletCards = () => {
 
     return (
         <>
-            <Modal active={activeModal} setActive={setActiveModal}>
-                <div><SuperInputText label={'Name of Deck'}/></div>
+            <Modal active={activeModalAddDeck} setActive={setActiveModalAddDeck}>
+                <div className={s.addDeckModal}>
+                    <div>Deck info:</div>
+                    <div><SuperInputText value={nameInModal.value} onChange={nameInModal.onChange} onBlur={() => {
+                        nameInModal.onBlur(true)
+                    }} label={'uniq name of Deck'}/></div>
+                    <div>private:<input checked={checkBoxInModal}
+                                        onChange={() => onChangeCheckBoxInModal(!checkBoxInModal)} type={'checkbox'}/>
+                    </div>
+                    <div><SuperButton onClick={onAddNewCardsClickHandler}>ADD NEW DECK</SuperButton></div>
+                </div>
             </Modal>
+            <Modal active={activeModalUpdateDeck} setActive={setActiveModalUpdateDeck}>
+                <div className={s.addDeckModal}>
+                    <div>Rename deck:</div>
+                    <div><SuperInputText value={nameInModal.value} onChange={nameInModal.onChange} onBlur={() => {
+                        nameInModal.onBlur(true)
+                    }} label={'New name for deck'}/></div>
+                    <div><SuperButton onClick={onClickUpdateHandler}>Rename</SuperButton></div>
+                </div>
+            </Modal>
+            <Modal active={activeModalDeleteDeck} setActive={setActiveModalDeleteDeck}>
+                <div className={s.addDeckModal}>
+                    <div>Are you sure?</div>
+                    <div className={s.DelDeckModal}>
+                        <div><SuperButton onClick={onDeleteCardsHandler}>OK</SuperButton></div>
+                        <div><SuperButton onClick={() => setActiveModalDeleteDeck(false)}>Cancel</SuperButton></div>
+                    </div>
+                </div>
+            </Modal>
+
+
             <div className={s.profile}>
-                <CardsDeckProfile setActiveModal={setActiveModal} cardPacksTotalCount={cardPacksTotalCount} avatar={avatar} name={name} _id={_id}
-                                  onAddNewCardsClickHandler={onAddNewCardsClickHandler}
+                <CardsDeckProfile setActiveModalAddDeck={setActiveModalAddDeck}
+                                  cardPacksTotalCount={cardPacksTotalCount}
+                                  avatar={avatar} name={name} _id={_id}
                                   rangeValue={rangeValue} onClickSearchBtnHandler={onClickSearchBtnHandler}
                                   onChangeRangeHandler={onChangeRangeHandler}/>
                 <div className={s.table}>
@@ -166,7 +230,8 @@ export const TabletCards = () => {
                     <div style={{display: 'inline-block'}}>
                         <input onChange={onChangeCheckBoxStatus} checked={checkBoxValue} type={'checkbox'}/>My cards
                     </div>
-                    <SearchBlock searchProperty={selectParamsOptions} selectedParams={selectedParams} onHandlerSearch={onHandlerSearch}
+                    <SearchBlock searchProperty={selectParamsOptions} selectedParams={selectedParams}
+                                 onHandlerSearch={onHandlerSearch}
                                  onClickSearchBtnHandler={onClickSearchBtnHandler} search={search}
                                  searchMode={searchMode} onAllPagesHandler={onAllPagesHandler}
                                  selectParamsOptions={selectParamsOptions} setOptionParams={setOptionParams}/>
@@ -190,10 +255,12 @@ export const TabletCards = () => {
                             <th>Actions</th>
                         </tr>
                         </thead>
-                        <CardOnly searchEmpty={searchEmpty} cardPacks={cardPacks} searchCardsArr={searchCardsArr}
+                        <CardOnly setActiveModalDeleteDeck={setActiveModalDeleteDeck}
+                                  setCardIdInModal={setCardIdInModal}
+                                  setActiveModalUpdateDeck={setActiveModalUpdateDeck} searchEmpty={searchEmpty}
+                                  cardPacks={cardPacks} searchCardsArr={searchCardsArr}
                                   pageForSearchMode={pageForSearchMode} profileId={profile.profile._id}
-                                  onDeleteCardsHandler={onDeleteCardsHandler}
-                                  onClickUpdateHandler={onClickUpdateHandler}/>
+                                  setNameDeck={nameInModal.onChange}/>
                     </table>
                 </div>
             </div>
@@ -201,7 +268,8 @@ export const TabletCards = () => {
                        totalItemsCount={cardPacksTotalCount} currentPage={currentPage} pageSize={pageCount}/>
 
         </>
-    );
+    )
+        ;
 }
 
 export default TabletCards;
