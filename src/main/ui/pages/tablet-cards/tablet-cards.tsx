@@ -194,7 +194,10 @@ export const TabletCards = () => {
                     <div>private:<input checked={checkBoxInModal}
                                         onChange={() => onChangeCheckBoxInModal(!checkBoxInModal)} type={'checkbox'}/>
                     </div>
+                    <div className={s.DelDeckModal}>
                     <div><SuperButton onClick={onAddNewCardsClickHandler}>ADD NEW DECK</SuperButton></div>
+                    <div><SuperButton onClick={()=>setActiveModalAddDeck(false)}>CANCEL</SuperButton></div>
+                    </div>
                 </div>
             </Modal>
             <Modal active={activeModalUpdateDeck} setActive={setActiveModalUpdateDeck}>
@@ -203,7 +206,10 @@ export const TabletCards = () => {
                     <div><SuperInputText value={nameInModal.value} onChange={nameInModal.onChange} onBlur={() => {
                         nameInModal.onBlur(true)
                     }} label={'New name for deck'}/></div>
+                    <div className={s.DelDeckModal}>
                     <div><SuperButton onClick={onClickUpdateHandler}>Rename</SuperButton></div>
+                    <div><SuperButton onClick={()=>setActiveModalUpdateDeck(false)}>Cancel</SuperButton></div>
+                        </div>
                 </div>
             </Modal>
             <Modal active={activeModalDeleteDeck} setActive={setActiveModalDeleteDeck}>
